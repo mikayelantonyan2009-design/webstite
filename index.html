@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 2026 Livery Editor</title>
+  <style>
+    body { margin: 0; overflow: hidden; font-family: Arial; }
+    #toolbar {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 150px;
+      height: 100%;
+      background: rgba(255,255,255,0.9);
+      padding: 10px;
+      overflow-y: auto;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+    }
+    #toolbar h3 { margin-top: 0; }
+    .decal {
+      width: 100px;
+      height: 50px;
+      margin: 5px 0;
+      background-size: contain;
+      background-repeat: no-repeat;
+      cursor: grab;
+      border: 1px solid #ccc;
+    }
+    #colorPickers {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.9);
+      padding: 10px;
+      border-radius: 5px;
+    }
+    label { display: block; margin: 5px 0; }
+  </style>
+</head>
+<body>
+
+<div id="colorPickers">
+  <label>
+    Body Color:
+    <input type="color" id="bodyColor" value="#ff0000">
+  </label>
+</div>
+
+<div id="toolbar">
+  <h3>Decals</h3>
+  <div class="decal" data-src="https://i.imgur.com/8Km9tLL.png" style="background-image: url('https://i.imgur.com/8Km9tLL.png');"></div>
+  <div class="decal" data-src="https://i.imgur.com/Z6NqkV8.png" style="background-image: url('https://i.imgur.com/Z6NqkV8.png');"></div>
+  <div class="decal" data-src="https://i.imgur.com/jA0g3tm.png" style="background-image: url('https://i.imgur.com/jA0g3tm.png');"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/DragControls.js"></script>
+
+<script>
+let scene, camera, renderer, controls, car;
+let decals = [];
+
+scene = new THREE.Scene();
+scene.background = new THREE.Color(0xaaaaaa);
+
+// Camera
+camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.set(0, 2, 5);
+
+// Renderer
+renderer = new THREE.WebGLRenderer({antialias: true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Controls
+controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+// Lights
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+dirLight.position.set(5,10,7.5);
+scene.add(dirLight);
+
+// Load car
+const loader = new THREE.GLTFLoader();
+loader.load(
+  'https://raw.githubusercontent.com/mikayelantonyan/f1car/main/f1_2026_model.glb', // Replace with your model URL
+  function(gltf) {
+    car = gltf.scene;
+    car.traverse(child => {
+      if(child.isMesh) child.material = child.material.clone();
+    });
+    scene.add(car);
+  },
+  undefined,
+  err => console.error(err)
+);
+
+// Resize
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Base color change
+document.getElementById('bodyColor').addEventListener('input', e => {
+  if(car){
+    car.traverse(child => {
+      if(child.isMesh && child.name.includes('Body')){
+        child.material.color.set(e.target.value);
+      }
+    });
+  }
+});
+
+// Raycaster for placing decals
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function onMouseClick(event){
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObject(car, true);
+  if(intersects.length > 0 && selectedDecal){
+    const point = intersects[0].point;
+    const decal = createDecal(selectedDecal, point);
+    decals.push(decal);
+    scene.add(decal);
+    selectedDecal = null; // Reset selected decal
+  }
+}
+window.addEventListener('click', onMouseClick);
+
+let selectedDecal = null;
+document.querySelectorAll('.decal').forEach(el => {
+  el.addEventListener('click', () => {
+    selectedDecal = el.dataset.src;
+  });
+});
+
+// Create decal mesh
+function createDecal(url, position){
+  const geometry = new THREE.PlaneGeometry(0.5, 0.25);
+  const texture = new THREE.TextureLoader().load(url);
+  const material = new THREE.MeshBasicMaterial({map: texture, transparent:true});
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.copy(position);
+  mesh.rotation.copy(new THREE.Euler(-Math.PI/2,0,0)); // Simple rotation
+  mesh.userData = {scale: 1};
+  return mesh;
+}
+
+// Drag controls
+const dragControls = new THREE.DragControls(decals, camera, renderer.domElement);
+dragControls.addEventListener('drag', function(){ controls.enabled = false; });
+dragControls.addEventListener('dragend', function(){ controls.enabled = true; });
+
+// Animation
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
