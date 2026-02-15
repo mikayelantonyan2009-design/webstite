@@ -76,15 +76,14 @@ let light = new THREE.DirectionalLight(0xffffff, 0.8);
 light.position.set(5,10,5);
 scene.add(light);
 
-let model;
-const loader = new THREE.GLTFLoader();
-loader.load(
-  'https://threejs.org/examples/models/gltf/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
-  function(gltf){
-    model = gltf.scene;
-    scene.add(model);
-  }
-);
+// Create simple 3D car placeholder (guaranteed to load)
+
+let geometry = new THREE.BoxGeometry(2, 0.5, 4);
+let material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+let model = new THREE.Mesh(geometry, material);
+
+scene.add(model);
+
 
 document.getElementById("bodyColor").addEventListener("input", function(e){
   if(model){
