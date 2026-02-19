@@ -1,179 +1,143 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>F1 Livery Editor</title>
+  <title>Open Games</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #87CEEB, #ff4d4d);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
 
-<style>
-body { margin: 0; overflow: hidden; font-family: Arial; }
+    h1 {
+      color: white;
+      margin-bottom: 20px;
+      font-size: 48px;
+    }
 
-#ui-left {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: white;
-  padding: 10px;
-  border-radius: 8px;
-}
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+    }
 
-#ui-right {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 180px;
-  height: 100%;
-  background: white;
-  padding: 10px;
-  box-shadow: -3px 0 6px rgba(0,0,0,0.2);
-}
+    .cell {
+      background-color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
 
-.decalBtn {
-  width: 140px;
-  height: 40px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  border: 1px solid #aaa;
-}
-</style>
+    .cell:hover {
+      background-color: #f0f0f0;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-size: 20px;
+      color: white;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #cc0000;
+    }
+  </style>
 </head>
 
 <body>
 
-<div id="ui-left">
-  Body Color:
-  <input type="color" id="bodyColor" value="#ff0000">
-</div>
+  <h1>Open Games</h1>
 
-<div id="ui-right">
-  <h3>Decals</h3>
-  <div class="decalBtn" data-type="square" style="background:black;"></div>
-  <div class="decalBtn" data-type="stripe" style="background:linear-gradient(to right, black 50%, white 50%);"></div>
-  <div class="decalBtn" data-type="triangle" style="background:linear-gradient(45deg, transparent 50%, black 50%);"></div>
-</div>
+  <div class="board" id="board"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/DragControls.js"></script>
+  <div id="status">Player X's turn</div>
+  <button onclick="restartGame()">Restart</button>
 
-<script>
-let scene = new THREE.Scene();
-scene.background = new THREE.Color(0xdddddd);
+  <script>
+    const board = document.getElementById("board");
+    const statusText = document.getElementById("status");
 
-let camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.set(0, 3, 6);
+    let currentPlayer = "X";
+    let cells = [];
+    let gameActive = true;
 
-let renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+    const winningCombos = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
 
-let controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+    function createBoard() {
+      board.innerHTML = "";
+      cells = [];
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-let light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(5,10,5);
-scene.add(light);
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.addEventListener("click", () => handleMove(i));
+        board.appendChild(cell);
+        cells.push(cell);
+      }
+    }
 
-/* ---------- CREATE CAR (No External Files) ---------- */
+    function handleMove(index) {
+      if (!gameActive || cells[index].textContent !== "") return;
 
-let carGroup = new THREE.Group();
+      cells[index].textContent = currentPlayer;
 
-// Body
-let bodyGeo = new THREE.BoxGeometry(2, 0.5, 4);
-let bodyMat = new THREE.MeshStandardMaterial({color:0xff0000});
-let body = new THREE.Mesh(bodyGeo, bodyMat);
-carGroup.add(body);
+      if (checkWinner()) {
+        statusText.textContent = `Player ${currentPlayer} wins!`;
+        gameActive = false;
+        return;
+      }
 
-// Cockpit
-let cockpitGeo = new THREE.BoxGeometry(1, 0.4, 1.5);
-let cockpitMat = new THREE.MeshStandardMaterial({color:0xff0000});
-let cockpit = new THREE.Mesh(cockpitGeo, cockpitMat);
-cockpit.position.set(0, 0.4, 0);
-carGroup.add(cockpit);
+      if (cells.every(cell => cell.textContent !== "")) {
+        statusText.textContent = "It's a draw!";
+        gameActive = false;
+        return;
+      }
 
-// Wheels
-let wheelGeo = new THREE.CylinderGeometry(0.5,0.5,0.4,32);
-let wheelMat = new THREE.MeshStandardMaterial({color:0x111111});
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      statusText.textContent = `Player ${currentPlayer}'s turn`;
+    }
 
-function addWheel(x,z){
-  let wheel = new THREE.Mesh(wheelGeo,wheelMat);
-  wheel.rotation.z = Math.PI/2;
-  wheel.position.set(x,-0.3,z);
-  carGroup.add(wheel);
-}
+    function checkWinner() {
+      return winningCombos.some(combo => {
+        return combo.every(index => {
+          return cells[index].textContent === currentPlayer;
+        });
+      });
+    }
 
-addWheel(1.1,1.5);
-addWheel(-1.1,1.5);
-addWheel(1.1,-1.5);
-addWheel(-1.1,-1.5);
+    function restartGame() {
+      currentPlayer = "X";
+      gameActive = true;
+      statusText.textContent = "Player X's turn";
+      createBoard();
+    }
 
-scene.add(carGroup);
-
-/* ---------- COLOR PICKER ---------- */
-
-document.getElementById("bodyColor").addEventListener("input", (e)=>{
-  body.material.color.set(e.target.value);
-  cockpit.material.color.set(e.target.value);
-});
-
-/* ---------- DECALS ---------- */
-
-let raycaster = new THREE.Raycaster();
-let mouse = new THREE.Vector2();
-let selectedType = null;
-let decals = [];
-
-document.querySelectorAll(".decalBtn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    selectedType = btn.dataset.type;
-  });
-});
-
-window.addEventListener("click", (event)=>{
-  if(!selectedType) return;
-
-  mouse.x = (event.clientX/window.innerWidth)*2-1;
-  mouse.y = -(event.clientY/window.innerHeight)*2+1;
-  raycaster.setFromCamera(mouse,camera);
-
-  let intersects = raycaster.intersectObject(body);
-  if(intersects.length>0){
-    let pos = intersects[0].point;
-    let geo = new THREE.PlaneGeometry(0.8,0.8);
-    let mat = new THREE.MeshBasicMaterial({
-      color:0x000000,
-      side:THREE.DoubleSide
-    });
-    let decal = new THREE.Mesh(geo,mat);
-    decal.position.copy(pos);
-    decal.lookAt(camera.position);
-    scene.add(decal);
-    decals.push(decal);
-  }
-});
-
-/* ---------- DRAG CONTROLS ---------- */
-
-let dragControls = new THREE.DragControls(decals, camera, renderer.domElement);
-dragControls.addEventListener('dragstart', ()=>controls.enabled=false);
-dragControls.addEventListener('dragend', ()=>controls.enabled=true);
-
-/* ---------- RENDER LOOP ---------- */
-
-function animate(){
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene,camera);
-}
-animate();
-
-window.addEventListener("resize", ()=>{
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth,window.innerHeight);
-});
-</script>
+    createBoard();
+  </script>
 
 </body>
 </html>
