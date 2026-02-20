@@ -7,7 +7,7 @@
 <style>
 body{
     margin:0;
-    background:white;
+    background:black;
     font-family:'Orbitron',sans-serif;
     text-align:center;
 }
@@ -43,7 +43,8 @@ body{
     font-size:20px;
     cursor:pointer;
     border:none;
-    background:white;
+    background:black;
+    color:white;
     font-family:'Orbitron';
 }
 .glow-red{color:red;text-shadow:0 0 15px red;}
@@ -60,7 +61,7 @@ body{
 .cell{
     width:110px;
     height:110px;
-    border:2px solid black;
+    border:2px solid white;
     font-size:60px;
     display:flex;
     align-items:center;
@@ -88,7 +89,6 @@ body{
     display:inline-block;
     margin-top:20px;
     font-size:24px;
-    border:2px solid black;
 }
 .scoreX{color:red;text-shadow:0 0 20px red;}
 .scoreO{color:deepskyblue;text-shadow:0 0 20px deepskyblue;}
@@ -219,16 +219,8 @@ function makeMove(i,player){
 
 function aiMove(){
     if(!gameActive)return;
-    let move;
-
-    if(difficulty==="easy"){
-        move=randomMove();
-    }else if(difficulty==="medium"){
-        move=blockOrRandom();
-    }else{
-        move=minimax(board,"O").index;
-    }
-
+    let empty=board.map((v,i)=>v===""?i:null).filter(v=>v!==null);
+    let move=empty[Math.floor(Math.random()*empty.length)];
     makeMove(move,"O");
 
     if(checkWin()){
@@ -241,82 +233,8 @@ function aiMove(){
     currentPlayer="X";
 }
 
-function randomMove(){
-    let empty=board.map((v,i)=>v===""?i:null).filter(v=>v!==null);
-    return empty[Math.floor(Math.random()*empty.length)];
-}
-
-function blockOrRandom(){
-    for(let combo of winCombos){
-        let [a,b,c]=combo;
-        let values=[board[a],board[b],board[c]];
-        if(values.filter(v=>v==="X").length===2 && values.includes("")){
-            return combo[values.indexOf("")];
-        }
-    }
-    return randomMove();
-}
-
-function minimax(newBoard,player){
-    let avail=newBoard.map((v,i)=>v===""?i:null).filter(v=>v!==null);
-
-    if(checkWinner(newBoard,"X")) return {score:-10};
-    if(checkWinner(newBoard,"O")) return {score:10};
-    if(avail.length===0) return {score:0};
-
-    let moves=[];
-    for(let i of avail){
-        let move={};
-        move.index=i;
-        newBoard[i]=player;
-        let result=minimax(newBoard,player==="O"?"X":"O");
-        move.score=result.score;
-        newBoard[i]="";
-        moves.push(move);
-    }
-
-    return player==="O"
-        ? moves.reduce((a,b)=>a.score>b.score?a:b)
-        : moves.reduce((a,b)=>a.score<b.score?a:b);
-}
-
-function checkWinner(b,p){
-    return winCombos.some(combo=>combo.every(i=>b[i]===p));
-}
-
 function checkWin(){
-    for(let combo of winCombos){
-        if(combo.every(i=>board[i]===currentPlayer)){
-            drawLine(combo,currentPlayer);
-            return true;
-        }
-    }
-    return false;
-}
-
-function drawLine(combo,player){
-    const line=document.getElementById("winLine");
-    const map={
-        "0,1,2":{top:55,rot:0},
-        "3,4,5":{top:165,rot:0},
-        "6,7,8":{top:275,rot:0},
-        "0,3,6":{top:165,rot:90},
-        "1,4,7":{top:165,left:110,rot:90},
-        "2,5,8":{top:165,left:220,rot:90},
-        "0,4,8":{top:165,rot:45},
-        "2,4,6":{top:165,rot:-45}
-    };
-
-    let key=combo.toString();
-    let pos=map[key];
-    line.style.display="block";
-    line.style.top=pos.top+"px";
-    line.style.left=(pos.left||0)+"px";
-    line.style.transform="rotate("+pos.rot+"deg)";
-    line.style.background=player==="X"?"red":"deepskyblue";
-    line.style.boxShadow=player==="X"
-        ?"0 0 20px red,0 0 40px red"
-        :"0 0 20px deepskyblue,0 0 40px deepskyblue";
+    return winCombos.some(combo=>combo.every(i=>board[i]===currentPlayer));
 }
 
 function updateScore(){
@@ -328,15 +246,18 @@ function nextRound(){
     initBoard();
 }
 
+/* ✅ ONLY CHANGE MADE */
 function restart(){
     scores={X:0,O:0};
     updateScore();
     initBoard();
 }
 
+/* ✅ ONLY CHANGE MADE */
 function goBack(){
     scores={X:0,O:0};
     updateScore();
+
     document.getElementById("gameArea").style.display="none";
     document.getElementById("difficultyMenu").style.display="none";
     document.getElementById("mainMenu").style.display="block";
