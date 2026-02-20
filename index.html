@@ -160,7 +160,6 @@ button.restart-btn.blue-glow, button.menu-btn.blue-glow, button.next-btn.blue-gl
   100% { text-shadow: 0 0 20px, 0 0 40px; transform: scale(1); }
 }
 .pulse { animation: pulse 0.5s ease-in-out; }
-
 </style>
 </head>
 <body>
@@ -172,13 +171,13 @@ button.restart-btn.blue-glow, button.menu-btn.blue-glow, button.next-btn.blue-gl
 
 <h2 class="page-title">Tic Tac Toe</h2>
 
-<!-- GAME SELECTION (NEW FIRST PAGE) -->
+<!-- FIRST PAGE: GAME SELECTION -->
 <div class="mode-selection" id="game-selection">
   <button class="blue-glow" onclick="selectGame('tictactoe')">Tic Tac Toe</button>
   <button class="red-glow" onclick="selectGame('airhockey')">Air Hockey</button>
 </div>
 
-<!-- MAIN MENU -->
+<!-- TIC TAC TOE MENU -->
 <div class="mode-selection" id="mode-selection" style="display:none;">
   <button class="red-glow" onclick="chooseMode('player')">Vs Player</button>
   <button class="blue-glow" onclick="chooseMode('computer')">Vs Computer</button>
@@ -233,7 +232,7 @@ let mode = "player";
 let aiDifficulty = "hard";
 let winningLine = null;
 let scores = { X:0, O:0 };
-let selectedGame = ""; // new
+let selectedGame = ""; // tracks which game is selected
 const winningCombos = [ [0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6] ];
 
 // FUNCTIONS
@@ -251,37 +250,29 @@ function selectGame(gameName){
   }
 }
 
-function chooseMode(selectedMode){
-  mode = selectedMode;
-  modeSelection.style.display="none";
-  if(mode==="computer") { xoSelection.style.display="flex"; }
-  else { startGame(); }
-}
+function backToMenu(){
+  // Reset scores
+  scores = { X:0, O:0 };
+  updateScoreboard();
 
-function chooseXO(symbol){
-  playerSymbol=symbol; aiSymbol = symbol==="X"?"O":"X";
-  xoSelection.style.display="none";
-  if(mode==="computer") difficultySelection.style.display="flex";
-}
-
-function chooseDifficulty(diff){
-  aiDifficulty = diff;
-  difficultySelection.style.display="none";
-  startGame();
-}
-
-function startGame(){
-  boardElement.style.display="grid";
-  scoreboard.style.display="flex";
-  restartButton.style.display="inline-block";
+  boardElement.style.display="none";
+  restartButton.style.display="none";
   nextButton.style.display="none";
-  backBtn.style.display="inline-block";
-  currentPlayer = "X"; gameActive=true; statusText.textContent=`Player ${playerSymbol}'s turn`;
-  createBoard();
-  if(mode==="computer" && aiSymbol==="X") setTimeout(computerMove,300);
+  scoreboard.style.display="none";
+  statusText.textContent="";
+
+  // Hide Tic Tac Toe pages
+  modeSelection.style.display="none";
+  xoSelection.style.display="none";
+  difficultySelection.style.display="none";
+
+  // Show first game selection page
+  document.getElementById("game-selection").style.display="flex";
+
+  backBtn.style.display="none";
 }
 
-// ...rest of Tic Tac Toe code stays unchanged (handleMove, createBoard, computerMove, minimax, etc.)...
+// ... rest of Tic Tac Toe functions (chooseMode, chooseXO, chooseDifficulty, startGame, createBoard, handleMove, computerMove, minimax, drawWinningLine, etc.) ...
 </script>
 </body>
 </html>
