@@ -5,6 +5,7 @@
 <title>Open Games</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
 <style>
+/* BODY */
 body {
   margin: 0;
   font-family: 'Orbitron', sans-serif;
@@ -40,18 +41,23 @@ header .games { color: #87CEEB; text-shadow: 0 0 20px #87CEEB, 0 0 40px #87CEEB;
   position: absolute;
   left: 15px;
   top: 15px;
-  padding: 8px 15px;
-  font-size: 16px;
+  padding: 12px 25px;
+  font-size: 18px;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
   font-family: 'Orbitron', sans-serif;
-  background-color: #ff4d4d;
-  color: white;
+  background-color: white;
+  color: #ff2e2e;
+  text-shadow: 0 0 15px #ff2e2e, 0 0 30px #ff2e2e;
+  transition: 0.2s;
   display: none;
 }
-#backBtn:hover { background-color: #cc0000; }
+#backBtn:hover {
+  transform: scale(1.05);
+}
 
+/* PAGE TITLE */
 h2.page-title {
   font-family: 'Orbitron', sans-serif;
   color: white;
@@ -59,7 +65,13 @@ h2.page-title {
   margin-bottom: 20px;
 }
 
-/* ALL BUTTONS */
+/* BUTTONS WITH SPACING AND GLOW */
+.mode-selection, .xo-selection, .difficulty-selection {
+  display: flex;
+  gap: 40px; /* Increased spacing */
+  margin-bottom: 20px;
+}
+
 button {
   padding: 15px 30px;
   font-size: 20px;
@@ -127,19 +139,19 @@ button:hover {
 
 #status { font-size: 22px; color: white; margin-bottom: 10px; }
 
-/* RESTART/NEXT/MENU BUTTONS */
+/* RESTART / NEXT BUTTONS */
 button.restart-btn, button.menu-btn, button.next-btn {
   padding: 10px 20px;
   font-size: 16px;
-  background-color: #ff4d4d;
-  color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-family: 'Orbitron', sans-serif;
-  margin: 5px;
+  background-color: white;
+  transition: 0.2s;
 }
-button.restart-btn:hover, button.menu-btn:hover, button.next-btn:hover { background-color: #cc0000; }
+button.restart-btn.red-glow, button.menu-btn.red-glow, button.next-btn.red-glow { color:#ff2e2e; text-shadow:0 0 15px #ff2e2e, 0 0 30px #ff2e2e; }
+button.restart-btn.blue-glow, button.menu-btn.blue-glow, button.next-btn.blue-glow { color:#87CEEB; text-shadow:0 0 15px #87CEEB, 0 0 30px #87CEEB; }
 
 /* WINNING LINE */
 .line {
