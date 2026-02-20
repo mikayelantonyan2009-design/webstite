@@ -56,6 +56,7 @@
     grid-template-rows: repeat(3, 100px);
     gap: 8px;
     margin-bottom: 20px;
+    position: relative;
   }
 
   .cell {
@@ -104,6 +105,18 @@
   button.restart-btn:hover {
     background-color: #cc0000;
   }
+
+  /* Winning line */
+  .line {
+    position: absolute;
+    background-color: yellow;
+    height: 5px;
+    width: 0;
+    top: 0;
+    left: 0;
+    transform-origin: center;
+    border-radius: 3px;
+  }
 </style>
 </head>
 
@@ -129,6 +142,7 @@ let currentPlayer = "X";
 let cells = [];
 let gameActive = true;
 let mode = "player";
+let winningLine = null;
 
 const winningCombos = [
   [0,1,2],[3,4,5],[6,7,8],
@@ -151,6 +165,8 @@ function startGame(selectedMode) {
 function createBoard() {
   boardElement.innerHTML = "";
   cells = [];
+  winningLine?.remove();
+  winningLine = null;
 
   for (let i = 0; i < 9; i++) {
     const cell = document.createElement("div");
@@ -167,9 +183,11 @@ function handleMove(index) {
   cells[index].textContent = currentPlayer;
   cells[index].classList.add(currentPlayer.toLowerCase());
 
-  if (checkWinner()) {
-    statusText.textContent = `Player ${currentPlayer} wins!`;
+  const winnerCombo = checkWinner();
+  if (winnerCombo) {
+    statusText.textContent = currentPlayer === "O" && mode==="computer" ? "Computer wins!" : `Player ${currentPlayer} wins!`;
     gameActive = false;
+    drawWinningLine(winnerCombo);
     return;
   }
 
@@ -183,12 +201,19 @@ function handleMove(index) {
   statusText.textContent = `Player ${currentPlayer}'s turn`;
 
   if (mode === "computer" && currentPlayer === "O" && gameActive) {
-    setTimeout(computerMove, 300);
+    setTimeout(computerMove, 200);
   }
 }
 
 function checkWinner() {
-  return winningCombos.some(combo => combo.every(index => cells[index].textContent === currentPlayer));
+  for (const combo of winningCombos) {
+    if (cells[combo[0]].textContent &&
+        cells[combo[0]].textContent === cells[combo[1]].textContent &&
+        cells[combo[1]].textContent === cells[combo[2]].textContent) {
+      return combo;
+    }
+  }
+  return null;
 }
 
 function restartGame() {
@@ -199,59 +224,86 @@ function restartGame() {
 }
 
 function computerMove() {
-  // 1. Win if possible
-  for (let i = 0; i < 9; i++) {
-    if (cells[i].textContent === "") {
-      cells[i].textContent = "O";
-      if (checkWinner()) {
-        cells[i].classList.add("o");
-        gameActive = false;
-        statusText.textContent = "Computer wins!";
-        return;
-      }
-      cells[i].textContent = "";
-    }
-  }
-
-  // 2. Block X from winning
-  for (let i = 0; i < 9; i++) {
-    if (cells[i].textContent === "") {
-      cells[i].textContent = "X";
-      if (checkWinner()) {
-        cells[i].textContent = "O";
-        cells[i].classList.add("o");
-        if (checkWinner()) {
-          gameActive = false;
-          statusText.textContent = "Computer wins!";
-        }
-        cells[i].textContent = "O";
-        return;
-      }
-      cells[i].textContent = "";
-    }
-  }
-
-  // 3. Take center if free
-  if (cells[4].textContent === "") {
-    handleMove(4);
-    return;
-  }
-
-  // 4. Take a corner
-  const corners = [0,2,6,8].filter(i => cells[i].textContent === "");
-  if (corners.length > 0) {
-    const corner = corners[Math.floor(Math.random() * corners.length)];
-    handleMove(corner);
-    return;
-  }
-
-  // 5. Otherwise random
-  const empty = cells.map((c,i) => c.textContent === "" ? i : null).filter(i => i !== null);
-  if (empty.length > 0) {
-    const randomIndex = empty[Math.floor(Math.random() * empty.length)];
-    handleMove(randomIndex);
-  }
+  const best = minimax(cells, "O");
+  handleMove(best.index);
 }
+
+// Minimax algorithm
+function minimax(newBoard, player) {
+  const availSpots = newBoard.map((c,i)=>c.textContent==="").map((v,i)=>v? i : null).filter(i=>i!==null);
+
+  const winnerCombo = checkWinnerBoard(newBoard);
+  if (winnerCombo && player==="O") return {score:-10};
+  if (winnerCombo && player==="X") return {score:10};
+  if (availSpots.length===0) return {score:0};
+
+  const moves = [];
+  for (let i=0;i<availSpots.length;i++){
+    const move = {};
+    move.index = availSpots[i];
+    newBoard[availSpots[i]].textContent = player;
+    const result = minimax(newBoard, player==="O"?"X":"O");
+    move.score = result.score;
+    newBoard[availSpots[i]].textContent = "";
+    moves.push(move);
+  }
+
+  let bestMove;
+  if(player==="O") {
+    let bestScore = -Infinity;
+    for(let i=0;i<moves.length;i++){
+      if(moves[i].score>bestScore){
+        bestScore = moves[i].score;
+        bestMove = moves[i];
+      }
+    }
+  } else {
+    let bestScore = Infinity;
+    for(let i=0;i<moves.length;i++){
+      if(moves[i].score<bestScore){
+        bestScore = moves[i].score;
+        bestMove = moves[i];
+      }
+    }
+  }
+  return bestMove;
+}
+
+// Helper to check winner on virtual board for minimax
+function checkWinnerBoard(boardArray) {
+  for (const combo of winningCombos) {
+    if (boardArray[combo[0]].textContent &&
+        boardArray[combo[0]].textContent === boardArray[combo[1]].textContent &&
+        boardArray[combo[1]].textContent === boardArray[combo[2]].textContent) {
+      return combo;
+    }
+  }
+  return null;
+}
+
+// Draw winning line
+function drawWinningLine(combo) {
+  const line = document.createElement("div");
+  line.classList.add("line");
+  boardElement.appendChild(line);
+  winningLine = line;
+
+  const size = 100 + 8; // cell size + gap
+  let x1 = combo[0]%3, y1 = Math.floor(combo[0]/3);
+  let x2 = combo[2]%3, y2 = Math.floor(combo[2]/3);
+  const startX = x1*size + size/2;
+  const startY = y1*size + size/2;
+  const endX = x2*size + size/2;
+  const endY = y2*size + size/2;
+  const length = Math.sqrt(Math.pow(endX-startX,2)+Math.pow(endY-startY,2));
+  const angle = Math.atan2(endY-startY,endX-startX)*180/Math.PI;
+
+  line.style.width = length+"px";
+  line.style.top = startY+"px";
+  line.style.left = startX+"px";
+  line.style.transform = `rotate(${angle}deg)`;
+}
+
 </script>
 
 </body>
