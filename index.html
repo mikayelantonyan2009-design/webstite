@@ -91,7 +91,7 @@
     margin-bottom: 10px;
   }
 
-  button.restart-btn {
+  button.restart-btn, button.menu-btn {
     padding: 10px 20px;
     font-size: 16px;
     background-color: #ff4d4d;
@@ -100,16 +100,16 @@
     border-radius: 8px;
     cursor: pointer;
     font-family: 'Orbitron', sans-serif;
+    margin: 5px;
   }
 
-  button.restart-btn:hover {
+  button.restart-btn:hover, button.menu-btn:hover {
     background-color: #cc0000;
   }
 
   /* Winning line */
   .line {
     position: absolute;
-    background-color: yellow;
     height: 5px;
     width: 0;
     top: 0;
@@ -130,12 +130,16 @@
 
 <div class="board" id="board" style="display:none;"></div>
 <div id="status"></div>
-<button class="restart-btn" onclick="restartGame()" style="display:none;">Restart</button>
+<div>
+  <button class="restart-btn" onclick="restartGame()" style="display:none;">Restart</button>
+  <button class="menu-btn" onclick="backToMenu()" style="display:none;">← Menu</button>
+</div>
 
 <script>
 const boardElement = document.getElementById("board");
 const statusText = document.getElementById("status");
 const restartButton = document.querySelector(".restart-btn");
+const menuButton = document.querySelector(".menu-btn");
 const modeSelection = document.getElementById("mode-selection");
 
 let currentPlayer = "X";
@@ -155,6 +159,7 @@ function startGame(selectedMode) {
   modeSelection.style.display = "none";
   boardElement.style.display = "grid";
   restartButton.style.display = "inline-block";
+  menuButton.style.display = "inline-block";
   document.body.style.background = "linear-gradient(135deg, #ff2e2e, #87CEEB)";
   currentPlayer = "X";
   gameActive = true;
@@ -185,9 +190,10 @@ function handleMove(index) {
 
   const winnerCombo = checkWinner();
   if (winnerCombo) {
+    const winnerColor = currentPlayer === "X" ? "#ff2e2e" : "#87CEEB";
     statusText.textContent = currentPlayer === "O" && mode==="computer" ? "Computer wins!" : `Player ${currentPlayer} wins!`;
     gameActive = false;
-    drawWinningLine(winnerCombo);
+    drawWinningLine(winnerCombo, winnerColor);
     return;
   }
 
@@ -221,6 +227,15 @@ function restartGame() {
   currentPlayer = "X";
   gameActive = true;
   statusText.textContent = `Player ${currentPlayer}'s turn`;
+}
+
+function backToMenu() {
+  boardElement.style.display = "none";
+  restartButton.style.display = "none";
+  menuButton.style.display = "none";
+  modeSelection.style.display = "flex";
+  statusText.textContent = "";
+  document.body.style.background = "linear-gradient(135deg, #87CEEB, #ff4d4d)";
 }
 
 function computerMove() {
@@ -269,7 +284,6 @@ function minimax(newBoard, player) {
   return bestMove;
 }
 
-// Helper to check winner on virtual board for minimax
 function checkWinnerBoard(boardArray) {
   for (const combo of winningCombos) {
     if (boardArray[combo[0]].textContent &&
@@ -282,9 +296,10 @@ function checkWinnerBoard(boardArray) {
 }
 
 // Draw winning line
-function drawWinningLine(combo) {
+function drawWinningLine(combo, color) {
   const line = document.createElement("div");
   line.classList.add("line");
+  line.style.backgroundColor = color;
   boardElement.appendChild(line);
   winningLine = line;
 
