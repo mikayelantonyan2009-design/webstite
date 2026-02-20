@@ -128,7 +128,7 @@ const modeSelection = document.getElementById("mode-selection");
 let currentPlayer = "X";
 let cells = [];
 let gameActive = true;
-let mode = "player"; // default vs player
+let mode = "player";
 
 const winningCombos = [
   [0,1,2],[3,4,5],[6,7,8],
@@ -199,10 +199,58 @@ function restartGame() {
 }
 
 function computerMove() {
-  let emptyIndexes = cells.map((c,i) => c.textContent === "" ? i : null).filter(i => i !== null);
-  if (emptyIndexes.length === 0) return;
-  const randomIndex = emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)];
-  handleMove(randomIndex);
+  // 1. Win if possible
+  for (let i = 0; i < 9; i++) {
+    if (cells[i].textContent === "") {
+      cells[i].textContent = "O";
+      if (checkWinner()) {
+        cells[i].classList.add("o");
+        gameActive = false;
+        statusText.textContent = "Computer wins!";
+        return;
+      }
+      cells[i].textContent = "";
+    }
+  }
+
+  // 2. Block X from winning
+  for (let i = 0; i < 9; i++) {
+    if (cells[i].textContent === "") {
+      cells[i].textContent = "X";
+      if (checkWinner()) {
+        cells[i].textContent = "O";
+        cells[i].classList.add("o");
+        if (checkWinner()) {
+          gameActive = false;
+          statusText.textContent = "Computer wins!";
+        }
+        cells[i].textContent = "O";
+        return;
+      }
+      cells[i].textContent = "";
+    }
+  }
+
+  // 3. Take center if free
+  if (cells[4].textContent === "") {
+    handleMove(4);
+    return;
+  }
+
+  // 4. Take a corner
+  const corners = [0,2,6,8].filter(i => cells[i].textContent === "");
+  if (corners.length > 0) {
+    const corner = corners[Math.floor(Math.random() * corners.length)];
+    handleMove(corner);
+    return;
+  }
+
+  // 5. Otherwise random
+  const empty = cells.map((c,i) => c.textContent === "" ? i : null).filter(i => i !== null);
+  if (empty.length > 0) {
+    const randomIndex = empty[Math.floor(Math.random() * empty.length)];
+    handleMove(randomIndex);
+  }
 }
 </script>
 
