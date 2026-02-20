@@ -12,18 +12,34 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
   background: linear-gradient(135deg, #87CEEB, #ff4d4d);
   transition: background 0.5s;
+  min-height: 100vh;
 }
 
-h1 {
-  color: white;
-  margin-bottom: 10px;
+header {
+  width: 100%;
+  background: white;
+  text-align: center;
+  padding: 15px 0;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+header h1 {
+  font-family: 'Orbitron', sans-serif;
   font-size: 48px;
-  letter-spacing: 3px;
-  text-shadow: 0 0 10px #00000050;
+  margin: 0;
+}
+
+header .open { color: #ff2e2e; text-shadow: 0 0 20px #ff2e2e, 0 0 40px #ff2e2e; }
+header .games { color: #87CEEB; text-shadow: 0 0 20px #87CEEB, 0 0 40px #87CEEB; }
+
+h2.page-title {
+  font-family: 'Orbitron', sans-serif;
+  color: white;
+  font-size: 48px;
+  margin-bottom: 20px;
 }
 
 .mode-selection, .xo-selection {
@@ -59,10 +75,7 @@ h1 {
   justify-content: center;
 }
 
-.scoreboard-box div {
-  text-shadow: 0 0 15px;
-}
-
+.scoreboard-box div { text-shadow: 0 0 15px; }
 .score-x { color: #ff2e2e; text-shadow: 0 0 20px #ff2e2e, 0 0 40px #ff2e2e; }
 .score-o { color: #87CEEB; text-shadow: 0 0 20px #87CEEB, 0 0 40px #87CEEB; }
 
@@ -128,13 +141,16 @@ button.restart-btn:hover, button.menu-btn:hover, button.next-btn:hover {
   100% { text-shadow: 0 0 20px, 0 0 40px; transform: scale(1); }
 }
 
-.pulse {
-  animation: pulse 0.5s ease-in-out;
-}
+.pulse { animation: pulse 0.5s ease-in-out; }
 </style>
 </head>
 <body>
-<h1>Open Games</h1>
+
+<header>
+  <h1><span class="open">Open</span> <span class="games">Games</span></h1>
+</header>
+
+<h2 class="page-title">Tic Tac Toe</h2>
 
 <div class="mode-selection" id="mode-selection">
   <button onclick="chooseMode('player')">Vs Player</button>
@@ -205,7 +221,6 @@ function startGame() {
   restartButton.style.display = "inline-block";
   nextButton.style.display = "none";
   menuButton.style.display = "inline-block";
-  document.body.style.background = "linear-gradient(135deg, #ff2e2e, #87CEEB)";
   currentPlayer = "X";
   gameActive = true;
   statusText.textContent = `Player ${playerSymbol}'s turn`;
@@ -275,23 +290,19 @@ function checkWinner() {
 function updateScoreboard(scoredPlayer) {
   scoreXDisplay.textContent = scores.X;
   scoreODisplay.textContent = scores.O;
-
   scoreXDisplay.classList.remove("pulse");
   scoreODisplay.classList.remove("pulse");
-
   if(scoredPlayer === "X") scoreXDisplay.classList.add("pulse");
   if(scoredPlayer === "O") scoreODisplay.classList.add("pulse");
 }
 
 function restartGame() { nextRound(); }
-
 function nextRound() {
   createBoard();
   currentPlayer = "X";
   gameActive = true;
   statusText.textContent = `Player ${playerSymbol}'s turn`;
   nextButton.style.display = "none";
-
   if(mode === "computer" && aiSymbol === "X") setTimeout(computerMove, 300);
 }
 
@@ -303,7 +314,6 @@ function backToMenu() {
   scoreboard.style.display = "none";
   statusText.textContent = "";
   modeSelection.style.display = "flex";
-  document.body.style.background = "linear-gradient(135deg, #87CEEB, #ff4d4d)";
 }
 
 function computerMove() {
@@ -317,7 +327,6 @@ function minimax(newBoard, player) {
   if (winnerCombo && player===aiSymbol) return {score:-10};
   if (winnerCombo && player!==aiSymbol) return {score:10};
   if (availSpots.length===0) return {score:0};
-
   const moves = [];
   for (let i=0;i<availSpots.length;i++){
     const move = {};
@@ -328,7 +337,6 @@ function minimax(newBoard, player) {
     newBoard[availSpots[i]].textContent = "";
     moves.push(move);
   }
-
   let bestMove;
   if(player === aiSymbol) {
     let bestScore = -Infinity;
@@ -374,8 +382,8 @@ function drawWinningLine(combo, color) {
   const size = cellSize + gap;
 
   const coords = combo.map(i => {
-    const x = i%3 * size + cellSize/2 + (i%3)*gap;
-    const y = Math.floor(i/3) * size + cellSize/2 + Math.floor(i/3)*gap;
+    const x = i%3 * size + cellSize/2;
+    const y = Math.floor(i/3) * size + cellSize/2;
     return {x,y};
   });
 
