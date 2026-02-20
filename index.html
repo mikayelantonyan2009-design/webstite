@@ -56,6 +56,7 @@ h1 {
   background-color: white;
   padding: 10px 30px;
   border-radius: 12px;
+  justify-content: center;
 }
 
 .scoreboard-box div {
@@ -136,8 +137,8 @@ button.restart-btn:hover, button.menu-btn:hover, button.next-btn:hover {
 </div>
 
 <div class="scoreboard-box" id="scoreboard" style="display:none;">
-  <div class="score-x" id="scoreX">X: 0</div>
-  <div class="score-o" id="scoreO">O: 0</div>
+  <div class="score-x" id="scoreX">0</div>
+  <div class="score-o" id="scoreO">0</div>
 </div>
 
 <div class="board" id="board" style="display:none;"></div>
@@ -162,6 +163,7 @@ const scoreODisplay = document.getElementById("scoreO");
 
 let currentPlayer = "X";
 let playerSymbol = "X";
+let aiSymbol = "O";
 let cells = [];
 let gameActive = true;
 let mode = "player";
@@ -182,6 +184,7 @@ function chooseMode(selectedMode) {
 
 function chooseXO(symbol) {
   playerSymbol = symbol;
+  aiSymbol = symbol === "X" ? "O" : "X";
   xoSelection.style.display = "none";
   startGame();
 }
@@ -197,6 +200,9 @@ function startGame() {
   gameActive = true;
   statusText.textContent = `Player ${playerSymbol}'s turn`;
   createBoard();
+
+  // AI plays first if AI is X
+  if(mode === "computer" && aiSymbol === "X") setTimeout(computerMove, 300);
 }
 
 function createBoard() {
@@ -224,7 +230,7 @@ function handleMove(index) {
     const winnerColor = currentPlayer === "X" ? "#ff2e2e" : "#87CEEB";
     scores[currentPlayer]++;
     updateScoreboard();
-    statusText.textContent = currentPlayer === "O" && mode==="computer" ? "Computer wins!" : `Player ${currentPlayer} wins!`;
+    statusText.textContent = currentPlayer === playerSymbol && mode==="computer" ? "You win!" : `Player ${currentPlayer} wins!`;
     gameActive = false;
     drawWinningLine(winnerCombo, winnerColor);
     nextButton.style.display = "inline-block";
@@ -239,10 +245,10 @@ function handleMove(index) {
   }
 
   currentPlayer = currentPlayer === "X" ? "O" : "X";
-  statusText.textContent = `Player ${currentPlayer}'s turn`;
+  statusText.textContent = currentPlayer === playerSymbol ? `Your turn` : `Computer's turn`;
 
-  if (mode === "computer" && currentPlayer !== playerSymbol && gameActive) {
-    setTimeout(computerMove, 200);
+  if (mode === "computer" && currentPlayer === aiSymbol && gameActive) {
+    setTimeout(computerMove, 300);
   }
 }
 
@@ -258,8 +264,8 @@ function checkWinner() {
 }
 
 function updateScoreboard() {
-  scoreXDisplay.textContent = `X: ${scores.X}`;
-  scoreODisplay.textContent = `O: ${scores.O}`;
+  scoreXDisplay.textContent = scores.X;
+  scoreODisplay.textContent = scores.O;
 }
 
 function restartGame() { nextRound(); }
@@ -270,6 +276,8 @@ function nextRound() {
   gameActive = true;
   statusText.textContent = `Player ${playerSymbol}'s turn`;
   nextButton.style.display = "none";
+
+  if(mode === "computer" && aiSymbol === "X") setTimeout(computerMove, 300);
 }
 
 function backToMenu() {
@@ -284,16 +292,16 @@ function backToMenu() {
 }
 
 function computerMove() {
-  const best = minimax(cells, currentPlayer);
+  const best = minimax(cells, aiSymbol);
   handleMove(best.index);
 }
 
+// Minimax AI
 function minimax(newBoard, player) {
   const availSpots = newBoard.map((c,i)=>c.textContent==="").map((v,i)=>v? i : null).filter(i=>i!==null);
-
   const winnerCombo = checkWinnerBoard(newBoard);
-  if (winnerCombo && player==="O") return {score:-10};
-  if (winnerCombo && player==="X") return {score:10};
+  if (winnerCombo && player===aiSymbol) return {score:-10};
+  if (winnerCombo && player!==aiSymbol) return {score:10};
   if (availSpots.length===0) return {score:0};
 
   const moves = [];
@@ -301,14 +309,14 @@ function minimax(newBoard, player) {
     const move = {};
     move.index = availSpots[i];
     newBoard[availSpots[i]].textContent = player;
-    const result = minimax(newBoard, player==="O"?"X":"O");
+    const result = minimax(newBoard, player===aiSymbol?playerSymbol:aiSymbol);
     move.score = result.score;
     newBoard[availSpots[i]].textContent = "";
     moves.push(move);
   }
 
   let bestMove;
-  if(player==="O") {
+  if(player === aiSymbol) {
     let bestScore = -Infinity;
     for(let i=0;i<moves.length;i++){
       if(moves[i].score>bestScore){
@@ -339,6 +347,7 @@ function checkWinnerBoard(boardArray) {
   return null;
 }
 
+// Draw winning line with exact center placement
 function drawWinningLine(combo, color) {
   const line = document.createElement("div");
   line.classList.add("line");
@@ -351,15 +360,16 @@ function drawWinningLine(combo, color) {
   const gap = 8;
   const size = cellSize + gap;
 
-  const x1 = combo[0]%3;
-  const y1 = Math.floor(combo[0]/3);
-  const x2 = combo[2]%3;
-  const y2 = Math.floor(combo[2]/3);
+  const coords = combo.map(i => {
+    const x = i%3 * size + cellSize/2 + (i%3)*gap;
+    const y = Math.floor(i/3) * size + cellSize/2 + Math.floor(i/3)*gap;
+    return {x,y};
+  });
 
-  const startX = x1*size + cellSize/2 + x1*gap;
-  const startY = y1*size + cellSize/2 + y1*gap;
-  const endX = x2*size + cellSize/2 + x2*gap;
-  const endY = y2*size + cellSize/2 + y2*gap;
+  const startX = coords[0].x;
+  const startY = coords[0].y;
+  const endX = coords[2].x;
+  const endY = coords[2].y;
 
   const length = Math.sqrt(Math.pow(endX-startX,2)+Math.pow(endY-startY,2));
   const angle = Math.atan2(endY-startY,endX-startX)*180/Math.PI;
