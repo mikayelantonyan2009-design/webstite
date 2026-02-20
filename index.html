@@ -121,6 +121,16 @@ button.restart-btn:hover, button.menu-btn:hover, button.next-btn:hover {
   from { width: 0; }
   to { width: var(--line-length); }
 }
+
+@keyframes pulse {
+  0% { text-shadow: 0 0 20px, 0 0 40px; transform: scale(1); }
+  50% { text-shadow: 0 0 30px, 0 0 60px; transform: scale(1.2); }
+  100% { text-shadow: 0 0 20px, 0 0 40px; transform: scale(1); }
+}
+
+.pulse {
+  animation: pulse 0.5s ease-in-out;
+}
 </style>
 </head>
 <body>
@@ -201,7 +211,6 @@ function startGame() {
   statusText.textContent = `Player ${playerSymbol}'s turn`;
   createBoard();
 
-  // AI plays first if AI is X
   if(mode === "computer" && aiSymbol === "X") setTimeout(computerMove, 300);
 }
 
@@ -229,7 +238,7 @@ function handleMove(index) {
   if (winnerCombo) {
     const winnerColor = currentPlayer === "X" ? "#ff2e2e" : "#87CEEB";
     scores[currentPlayer]++;
-    updateScoreboard();
+    updateScoreboard(currentPlayer);
     statusText.textContent = currentPlayer === playerSymbol && mode==="computer" ? "You win!" : `Player ${currentPlayer} wins!`;
     gameActive = false;
     drawWinningLine(winnerCombo, winnerColor);
@@ -263,9 +272,15 @@ function checkWinner() {
   return null;
 }
 
-function updateScoreboard() {
+function updateScoreboard(scoredPlayer) {
   scoreXDisplay.textContent = scores.X;
   scoreODisplay.textContent = scores.O;
+
+  scoreXDisplay.classList.remove("pulse");
+  scoreODisplay.classList.remove("pulse");
+
+  if(scoredPlayer === "X") scoreXDisplay.classList.add("pulse");
+  if(scoredPlayer === "O") scoreODisplay.classList.add("pulse");
 }
 
 function restartGame() { nextRound(); }
@@ -296,7 +311,6 @@ function computerMove() {
   handleMove(best.index);
 }
 
-// Minimax AI
 function minimax(newBoard, player) {
   const availSpots = newBoard.map((c,i)=>c.textContent==="").map((v,i)=>v? i : null).filter(i=>i!==null);
   const winnerCombo = checkWinnerBoard(newBoard);
@@ -347,7 +361,6 @@ function checkWinnerBoard(boardArray) {
   return null;
 }
 
-// Draw winning line with exact center placement
 function drawWinningLine(combo, color) {
   const line = document.createElement("div");
   line.classList.add("line");
