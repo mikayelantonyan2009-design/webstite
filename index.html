@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Open Games</title>
 
-<!-- Orbitron font -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
 
 <style>
@@ -77,12 +76,12 @@
 
   .x {
     color: #ff2e2e;
-    text-shadow: 0 0 10px #ff2e2e;
+    text-shadow: 0 0 15px #ff2e2e;
   }
 
   .o {
     color: #87CEEB;
-    text-shadow: 0 0 10px #87CEEB;
+    text-shadow: 0 0 15px #87CEEB;
   }
 
   #status {
@@ -111,15 +110,18 @@
   .line {
     position: absolute;
     height: 5px;
-    width: 0;
-    top: 0;
-    left: 0;
-    transform-origin: center;
+    background-color: yellow;
     border-radius: 3px;
+    transform-origin: 0 50%;
+    animation: draw 0.5s forwards;
+  }
+
+  @keyframes draw {
+    from { width: 0; }
+    to { width: var(--line-length); }
   }
 </style>
 </head>
-
 <body>
 <h1>Open Games</h1>
 
@@ -243,7 +245,6 @@ function computerMove() {
   handleMove(best.index);
 }
 
-// Minimax algorithm
 function minimax(newBoard, player) {
   const availSpots = newBoard.map((c,i)=>c.textContent==="").map((v,i)=>v? i : null).filter(i=>i!==null);
 
@@ -295,31 +296,38 @@ function checkWinnerBoard(boardArray) {
   return null;
 }
 
-// Draw winning line
 function drawWinningLine(combo, color) {
   const line = document.createElement("div");
   line.classList.add("line");
   line.style.backgroundColor = color;
+  line.style.boxShadow = `0 0 15px ${color}, 0 0 30px ${color}`;
   boardElement.appendChild(line);
   winningLine = line;
 
-  const size = 100 + 8; // cell size + gap
-  let x1 = combo[0]%3, y1 = Math.floor(combo[0]/3);
-  let x2 = combo[2]%3, y2 = Math.floor(combo[2]/3);
-  const startX = x1*size + size/2;
-  const startY = y1*size + size/2;
-  const endX = x2*size + size/2;
-  const endY = y2*size + size/2;
+  const cellSize = 100; // cell width/height
+  const gap = 8;
+  const size = cellSize + gap;
+
+  const x1 = combo[0]%3;
+  const y1 = Math.floor(combo[0]/3);
+  const x2 = combo[2]%3;
+  const y2 = Math.floor(combo[2]/3);
+
+  const startX = x1*size + cellSize/2 + x1*gap;
+  const startY = y1*size + cellSize/2 + y1*gap;
+  const endX = x2*size + cellSize/2 + x2*gap;
+  const endY = y2*size + cellSize/2 + y2*gap;
+
   const length = Math.sqrt(Math.pow(endX-startX,2)+Math.pow(endY-startY,2));
   const angle = Math.atan2(endY-startY,endX-startX)*180/Math.PI;
 
-  line.style.width = length+"px";
+  line.style.width = "0px";
   line.style.top = startY+"px";
   line.style.left = startX+"px";
   line.style.transform = `rotate(${angle}deg)`;
+  line.style.setProperty("--line-length", length+"px");
+  line.style.animation = "draw 0.5s forwards";
 }
-
 </script>
-
 </body>
 </html>
