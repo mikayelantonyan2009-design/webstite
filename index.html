@@ -140,21 +140,13 @@ button.restart-btn.blue-glow, button.next-btn.blue-glow { color:#87CEEB; text-sh
 /* WINNING LINE */
 .line {
   position: absolute;
-  height: 5px;
-  border-radius: 3px;
-  transform-origin: 0 50%;
-  animation: draw 0.5s forwards;
-  z-index: 20;   /* add this */
+  height: 6px;
+  border-radius: 4px;
+  transform-origin: left center;
   pointer-events: none;
+  z-index: 20;
 }
-@keyframes draw { from { width:0; } to { width: var(--line-length); } }
 
-/* SCOREBOARD PULSE */
-@keyframes pulse {
-  0% { text-shadow: 0 0 20px, 0 0 40px; transform: scale(1); }
-  50% { text-shadow: 0 0 30px, 0 0 60px; transform: scale(1.2); }
-  100% { text-shadow: 0 0 20px, 0 0 40px; transform: scale(1); }
-}
 .pulse { animation: pulse 0.5s ease-in-out; }
 </style>
 </head>
@@ -372,37 +364,36 @@ function resetScores(){
 }
 
 // ================= WIN LINE =================
-function drawWinningLine(combo,color){
-  if(winningLine) winningLine.remove();
+function drawWinningLine(combo, color) {
+  if (winningLine) winningLine.remove();
 
-  const size = 100; // cell size
-  const gap = 8; // grid gap
+  const cellSize = 100;
+  const gap = 8;
 
-  const startRow = Math.floor(combo[0]/3);
-  const startCol = combo[0]%3;
-  const endRow = Math.floor(combo[2]/3);
-  const endCol = combo[2]%3;
+  const startRow = Math.floor(combo[0] / 3);
+  const startCol = combo[0] % 3;
+  const endRow = Math.floor(combo[2] / 3);
+  const endCol = combo[2] % 3;
 
-  const x1 = startCol*(size+gap) + size/2;
-  const y1 = startRow*(size+gap) + size/2;
-  const x2 = endCol*(size+gap) + size/2;
-  const y2 = endRow*(size+gap) + size/2;
+  const x1 = startCol * (cellSize + gap) + cellSize / 2;
+  const y1 = startRow * (cellSize + gap) + cellSize / 2;
+  const x2 = endCol * (cellSize + gap) + cellSize / 2;
+  const y2 = endRow * (cellSize + gap) + cellSize / 2;
 
-  const line=document.createElement("div");
-  line.classList.add("line");
+  const length = Math.hypot(x2 - x1, y2 - y1);
+  const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
 
-  const length=Math.hypot(x2-x1, y2-y1);
-  const angle=Math.atan2(y2-y1,x2-x1)*(180/Math.PI);
-
-  line.style.width=length+"px";
-  line.style.left=x1+"px";
-  line.style.top=y1+"px";
-  line.style.transform=`rotate(${angle}deg)`;
-  line.style.background=color;
-  line.style.boxShadow=`0 0 15px ${color}, 0 0 30px ${color}`;
+  const line = document.createElement("div");
+  line.className = "line";
+  line.style.width = length + "px";
+  line.style.left = x1 + "px";
+  line.style.top = y1 + "px";
+  line.style.transform = `rotate(${angle}deg)`;
+  line.style.background = color;
+  line.style.boxShadow = `0 0 15px ${color}, 0 0 30px ${color}`;
 
   boardElement.appendChild(line);
-  winningLine=line;
+  winningLine = line;
 }
 
 // ================= RESTART & NEXT =================
