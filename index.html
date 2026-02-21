@@ -196,114 +196,215 @@ button.restart-btn.blue-glow, button.next-btn.blue-glow { color:#87CEEB; text-sh
 </div>
 
 <script>
-// VARIABLES
-const boardElement = document.getElementById("board");
-const statusText = document.getElementById("status");
-const backBtn = document.getElementById("backBtn");
-const restartButton = document.querySelector(".restart-btn");
-const nextButton = document.querySelector(".next-btn");
-const modeSelection = document.getElementById("mode-selection");
-const xoSelection = document.getElementById("xo-selection");
-const difficultySelection = document.getElementById("difficulty-selection");
-const scoreboard = document.getElementById("scoreboard");
+// ================= DOM =================
+const cells = document.querySelectorAll(".cell");
+const boardElement = document.querySelector(".board");
 const scoreXDisplay = document.getElementById("scoreX");
 const scoreODisplay = document.getElementById("scoreO");
 
+// ================= VARIABLES =================
+let board = ["","","","","","","","",""];
 let currentPlayer = "X";
-let playerSymbol = "X";
-let aiSymbol = "O";
-let cells = [];
-let gameActive = true;
-let mode = "player";
-let aiDifficulty = "hard";
+let gameOver = false;
+
+let gameMode = null; // "pvp" or "ai"
+let aiPlayer = "O";
+let aiDifficulty = "medium";
+
+let scores = { X: 0, O: 0 };
 let winningLine = null;
-let scores = { X:0, O:0 };
-const winningCombos = [ [0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6] ];
 
-// FUNCTIONS
-function chooseMode(selectedMode){
-  mode = selectedMode;
-  modeSelection.style.display="none";
-  if(mode==="computer") { xoSelection.style.display="flex"; }
-  else { startGame(); }
-}
+// ================= WINNING COMBOS =================
+const winningCombinations = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
 
-function chooseXO(symbol){
-  playerSymbol=symbol; aiSymbol = symbol==="X"?"O":"X";
-  xoSelection.style.display="none";
-  if(mode==="computer") difficultySelection.style.display="flex";
-}
+// ================= CELL CLICK =================
+cells.forEach(cell => {
+  cell.addEventListener("click", () => {
+    const index = cell.dataset.index;
 
-function chooseDifficulty(diff){
-  aiDifficulty = diff;
-  difficultySelection.style.display="none";
-  startGame();
-}
+    if (board[index] !== "" || gameOver) return;
 
-function startGame(){
-  boardElement.style.display="grid";
-  scoreboard.style.display="flex";
-  restartButton.style.display="inline-block";
-  nextButton.style.display="none";
-  backBtn.style.display="inline-block";
-  currentPlayer = "X"; gameActive=true; statusText.textContent=`Player ${playerSymbol}'s turn`;
-  createBoard();
-  if(mode==="computer" && aiSymbol==="X") setTimeout(computerMove,300);
-}
+    makeMove(index);
+  });
+});
 
-function createBoard(){
-  boardElement.innerHTML=""; cells=[];
-  winningLine?.remove(); winningLine=null;
-  for(let i=0;i<9;i++){
-    const cell=document.createElement("div");
-    cell.classList.add("cell");
-    cell.addEventListener("click",()=>handleMove(i));
-    boardElement.appendChild(cell);
-    cells.push(cell);
+// ================= MAKE MOVE =================
+function makeMove(index){
+  board[index] = currentPlayer;
+  cells[index].textContent = currentPlayer;
+
+  cells[index].classList.add(currentPlayer === "X" ? "x-glow" : "o-glow");
+
+  if (checkWinner()) return;
+
+  if (board.every(cell => cell !== "")) {
+    gameOver = true;
+    return;
+  }
+
+  switchPlayer();
+
+  // AI trigger
+  if (gameMode === "ai" && currentPlayer === aiPlayer && !gameOver) {
+    setTimeout(makeAIMove, 400);
   }
 }
 
-function handleMove(index){
-  if(!gameActive || cells[index].textContent!=="") return;
-  cells[index].textContent=currentPlayer;
-  cells[index].classList.add(currentPlayer.toLowerCase());
-  const winnerCombo=checkWinner();
-  if(winnerCombo){
-    const color=currentPlayer==="X"?"#ff2e2e":"#87CEEB";
-    scores[currentPlayer]++;
-    updateScoreboard(currentPlayer);
-    statusText.textContent=(currentPlayer===playerSymbol && mode==="computer")?"You win!":`Player ${currentPlayer} wins!`;
-    gameActive=false; drawWinningLine(winnerCombo,color); nextButton.style.display="inline-block"; return;
+// ================= SWITCH PLAYER =================
+function switchPlayer(){
+  currentPlayer = currentPlayer === "X" ? "O" : "X";
+}
+
+// ================= CHECK WIN =================
+function checkWinner(){
+  for (let combo of winningCombinations) {
+    const [a,b,c] = combo;
+
+    if (
+      board[a] &&
+      board[a] === board[b] &&
+      board[a] === board[c]
+    ) {
+      gameOver = true;
+
+      scores[currentPlayer]++;
+      updateScoreboard(currentPlayer);
+
+      const color = currentPlayer === "X" ? "red" : "skyblue";
+      drawWinningLine(combo, color);
+
+      return true;
+    }
   }
-  if(cells.every(c=>c.textContent!=="")){ statusText.textContent="It's a draw!"; gameActive=false; nextButton.style.display="inline-block"; return;}
-  currentPlayer=currentPlayer==="X"?"O":"X";
-  statusText.textContent=currentPlayer===playerSymbol?"Your turn":"Computer's turn";
-  if(mode==="computer" && currentPlayer===aiSymbol && gameActive) setTimeout(computerMove,300);
+  return false;
 }
 
-function checkWinner(){ for(const combo of winningCombos){ if(cells[combo[0]].textContent && cells[combo[0]].textContent===cells[combo[1]].textContent && cells[combo[1]].textContent===cells[combo[2]].textContent) return combo;} return null; }
-function updateScoreboard(scoredPlayer){ scoreXDisplay.textContent=scores.X; scoreODisplay.textContent=scores.O; scoreXDisplay.classList.remove("pulse"); scoreODisplay.classList.remove("pulse"); if(scoredPlayer==="X") scoreXDisplay.classList.add("pulse"); if(scoredPlayer==="O") scoreODisplay.classList.add("pulse"); }
+// ================= SCOREBOARD =================
+function updateScoreboard(scoredPlayer){
+  scoreXDisplay.textContent = scores.X;
+  scoreODisplay.textContent = scores.O;
 
-function restartGame(){ 
-  scores = { X:0, O:0 }; 
-  updateScoreboard(); 
-  nextRound(); 
+  scoreXDisplay.classList.remove("pulse");
+  scoreODisplay.classList.remove("pulse");
+
+  if(scoredPlayer==="X") scoreXDisplay.classList.add("pulse");
+  if(scoredPlayer==="O") scoreODisplay.classList.add("pulse");
 }
-function nextRound(){ 
-  createBoard(); currentPlayer="X"; gameActive=true; 
-  statusText.textContent=`Player ${playerSymbol}'s turn`; 
-  nextButton.style.display="none"; 
-  if(mode==="computer" && aiSymbol==="X") setTimeout(computerMove,300);
+
+// ================= DRAW WIN LINE =================
+function drawWinningLine(combo, color){
+  if (winningLine) winningLine.remove();
+
+  const boardRect = boardElement.getBoundingClientRect();
+  const firstCell = cells[combo[0]].getBoundingClientRect();
+  const lastCell = cells[combo[2]].getBoundingClientRect();
+
+  const line = document.createElement("div");
+  line.classList.add("line");
+
+  const x1 = firstCell.left + firstCell.width / 2 - boardRect.left;
+  const y1 = firstCell.top + firstCell.height / 2 - boardRect.top;
+  const x2 = lastCell.left + lastCell.width / 2 - boardRect.left;
+  const y2 = lastCell.top + lastCell.height / 2 - boardRect.top;
+
+  const length = Math.hypot(x2 - x1, y2 - y1);
+  const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+
+  line.style.width = length + "px";
+  line.style.left = x1 + "px";
+  line.style.top = y1 + "px";
+  line.style.transform = `rotate(${angle}deg)`;
+  line.style.background = color;
+  line.style.boxShadow = `0 0 15px ${color}, 0 0 30px ${color}`;
+
+  boardElement.appendChild(line);
+  winningLine = line;
 }
-function backToMenu(){ 
-  scores = { X:0, O:0 }; 
+
+// ================= RESTART GAME =================
+function restartGame(){
+  board = ["","","","","","","","",""];
+  gameOver = false;
+  currentPlayer = "X";
+
+  cells.forEach(cell => {
+    cell.textContent = "";
+    cell.classList.remove("x-glow","o-glow");
+  });
+
+  if (winningLine) winningLine.remove();
+}
+
+// ================= RESET SCORES =================
+function resetScores(){
+  scores = { X: 0, O: 0 };
   updateScoreboard();
-  boardElement.style.display="none"; restartButton.style.display="none"; nextButton.style.display="none"; scoreboard.style.display="none"; statusText.textContent="";
-  modeSelection.style.display="flex"; xoSelection.style.display="none"; difficultySelection.style.display="none"; 
-  backBtn.style.display="none";
 }
 
-// The rest of AI functions (computerMove, minimax, drawWinningLine etc.) remain unchanged
+// ================= AI =================
+function makeAIMove(){
+  if (gameOver) return;
+
+  let move;
+
+  if (aiDifficulty === "easy") {
+    move = getRandomMove();
+  } 
+  else if (aiDifficulty === "medium") {
+    move = getSmartMove() ?? getRandomMove();
+  } 
+  else {
+    move = getSmartMove();
+  }
+
+  if (move !== undefined) {
+    makeMove(move);
+  }
+}
+
+function getRandomMove(){
+  const empty = board
+    .map((val, i) => val === "" ? i : null)
+    .filter(v => v !== null);
+
+  if (empty.length === 0) return;
+
+  return empty[Math.floor(Math.random() * empty.length)];
+}
+
+function getSmartMove(){
+  // Try to win
+  for (let combo of winningCombinations) {
+    const values = combo.map(i => board[i]);
+
+    if (
+      values.filter(v => v === aiPlayer).length === 2 &&
+      values.includes("")
+    ) {
+      return combo[values.indexOf("")];
+    }
+  }
+
+  // Block opponent
+  const opponent = aiPlayer === "X" ? "O" : "X";
+
+  for (let combo of winningCombinations) {
+    const values = combo.map(i => board[i]);
+
+    if (
+      values.filter(v => v === opponent).length === 2 &&
+      values.includes("")
+    ) {
+      return combo[values.indexOf("")];
+    }
+  }
+
+  return null;
+}
 </script>
 </body>
 </html>
