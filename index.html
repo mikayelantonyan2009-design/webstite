@@ -15,14 +15,7 @@ body {
   min-height: 100vh;
   position: relative;
 }
-.line {
-    position: absolute;
-    height: 6px;
-    border-radius: 4px;
-    transform-origin: left center;
-    pointer-events: none;
-    z-index: 10;
-}
+
 /* HEADER */
 header {
   width: 100%;
@@ -121,6 +114,8 @@ button:hover { transform: scale(1.05); }
   cursor: pointer;
   border-radius: 12px;
   transition: transform 0.1s ease, background 0.2s;
+  position: relative;
+  z-index: 1;
 }
 .cell:hover { background-color: #f0f0f0; transform: scale(1.05); }
 .x { color: #ff2e2e; text-shadow: 0 0 15px #ff2e2e; }
@@ -149,6 +144,8 @@ button.restart-btn.blue-glow, button.next-btn.blue-glow { color:#87CEEB; text-sh
   border-radius: 3px;
   transform-origin: 0 50%;
   animation: draw 0.5s forwards;
+  z-index: 20;   /* add this */
+  pointer-events: none;
 }
 @keyframes draw { from { width:0; } to { width: var(--line-length); } }
 
@@ -164,7 +161,7 @@ button.restart-btn.blue-glow, button.next-btn.blue-glow { color:#87CEEB; text-sh
 <body>
 
 <header>
-  <button id="backBtn" onclick="backToMenu()">← Back</button>
+  <button id="backBtn" onclick="goBack()">← Back</button>
   <h1><span class="open">Open</span> <span class="games">Games</span></h1>
 </header>
 
