@@ -5,6 +5,27 @@
 <title>Open Games</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
 <style>
+.game-selection {
+  display: flex;
+  gap: 60px;
+  margin-top: 40px;
+}
+
+.game-btn {
+  width: 260px;
+  height: 120px;
+  font-size: 32px;
+  border-radius: 20px;
+  background: white;
+  border: none;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  transition: 0.2s;
+}
+
+.game-btn:hover {
+  transform: scale(1.08);
+}
 body {
   margin: 0;
   font-family: 'Orbitron', sans-serif;
@@ -176,8 +197,14 @@ button.restart-btn.blue-glow, button.next-btn.blue-glow { color:#87CEEB; text-sh
   <h1><span class="open">Open</span> <span class="games">Games</span></h1>
 </header>
 
-<h2 class="page-title">Tic Tac Toe</h2>
+<h2 class="page-title" id="page-title">Open Games</h2>
 
+ <!-- MAIN GAME SELECTION -->
+<div class="mode-selection" id="mode-selection" style="display:none;">
+  <button class="game-btn blue-glow" onclick="openTicTacToe()">Tic Tac Toe</button>
+  <button class="game-btn red-glow">Air Hockey</button>
+</div>
+  
 <!-- TIC TAC TOE MENU -->
 <div class="mode-selection" id="mode-selection">
   <button class="red-glow" onclick="chooseMode('player')">Vs Player</button>
@@ -242,6 +269,14 @@ const winningCombinations = [
   [0,4,8],[2,4,6]
 ];
 
+const gameSelection = document.getElementById("game-selection");
+const pageTitle = document.getElementById("page-title");
+
+function openTicTacToe(){
+  gameSelection.style.display = "none";
+  pageTitle.textContent = "Tic Tac Toe";
+  modeSelection.style.display = "flex";
+}
 // ================= CREATE BOARD =================
 function createBoard(){
   boardElement.innerHTML = "";
@@ -272,7 +307,9 @@ function goBack() {
     backBtn.style.display = "none";
 
     // Show main menu
-    modeSelection.style.display = "flex";
+    modeSelection.style.display = "none";
+    gameSelection.style.display = "flex";
+    pageTitle.textContent = "Open Games";
 
     // Reset scores
     scores = { X: 0, O: 0 };
