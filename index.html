@@ -211,7 +211,7 @@ const nextBtn = document.querySelector(".next-btn");
 // ================= VARIABLES =================
 let cells = [];
 let board = ["","","","","","","","",""];
-let currentPlayer = "X";
+let currentPlayer = "X"; // Always X starts
 let playerSymbol = "X";
 let aiPlayer = "O";
 let gameMode = null;
@@ -237,7 +237,7 @@ function createBoard(){
     cell.dataset.index = i;
 
     cell.addEventListener("click", () => {
-      if(board[i]!=="" || gameOver) return;
+      if(board[i]!="" || gameOver) return;
       makeMove(i);
     });
 
@@ -256,8 +256,8 @@ function chooseMode(mode){
 
 function chooseXO(symbol){
   playerSymbol = symbol;
-  aiPlayer = symbol==="X"?"O":"X";
-  currentPlayer = "X";
+  aiPlayer = symbol==="X"?"O":"X"; // AI is opposite
+  currentPlayer = "X"; // Always X starts
   xoSelection.style.display="none";
 
   if(gameMode==="ai"){
@@ -282,22 +282,12 @@ function startGame(){
   createBoard();
   gameOver=false;
   board=["","","","","","","","",""];
+  currentPlayer="X"; // Always X starts
 
+  // If AI is X, let it start
   if(gameMode==="ai" && currentPlayer===aiPlayer){
-    setTimeout(makeAIMove,400);
+    setTimeout(makeAIMove, 400);
   }
-}
-
-function backToMenu(){
-  resetScores();
-  boardElement.style.display="none";
-  scoreboard.style.display="none";
-  restartBtn.style.display="none";
-  nextBtn.style.display="none";
-  xoSelection.style.display="none";
-  difficultySelection.style.display="none";
-  modeSelection.style.display="flex";
-  backBtn.style.display="none";
 }
 
 // ================= GAME LOGIC =================
@@ -313,13 +303,14 @@ function makeMove(index){
     return;
   }
 
-  currentPlayer=currentPlayer==="X"?"O":"X";
+  currentPlayer = currentPlayer==="X"?"O":"X";
 
   if(gameMode==="ai" && currentPlayer===aiPlayer && !gameOver){
-    setTimeout(makeAIMove,400);
+    setTimeout(makeAIMove, 400);
   }
 }
 
+// ================= CHECK WIN =================
 function checkWinner(){
   for(let combo of winningCombinations){
     const[a,b,c]=combo;
@@ -336,8 +327,8 @@ function checkWinner(){
 
 // ================= SCOREBOARD =================
 function updateScoreboard(player){
-  scoreXDisplay.textContent=scores.X;
-  scoreODisplay.textContent=scores.O;
+  scoreXDisplay.textContent = scores.X;
+  scoreODisplay.textContent = scores.O;
 
   scoreXDisplay.classList.remove("pulse");
   scoreODisplay.classList.remove("pulse");
@@ -355,19 +346,23 @@ function resetScores(){
 function drawWinningLine(combo,color){
   if(winningLine) winningLine.remove();
 
-  const boardRect=boardElement.getBoundingClientRect();
-  const first=cells[combo[0]].getBoundingClientRect();
-  const last=cells[combo[2]].getBoundingClientRect();
+  const size = 100; // cell size
+  const gap = 8; // grid gap
+
+  const startRow = Math.floor(combo[0]/3);
+  const startCol = combo[0]%3;
+  const endRow = Math.floor(combo[2]/3);
+  const endCol = combo[2]%3;
+
+  const x1 = startCol*(size+gap) + size/2;
+  const y1 = startRow*(size+gap) + size/2;
+  const x2 = endCol*(size+gap) + size/2;
+  const y2 = endRow*(size+gap) + size/2;
 
   const line=document.createElement("div");
   line.classList.add("line");
 
-  const x1=first.left+first.width/2-boardRect.left;
-  const y1=first.top+first.height/2-boardRect.top;
-  const x2=last.left+last.width/2-boardRect.left;
-  const y2=last.top+last.height/2-boardRect.top;
-
-  const length=Math.hypot(x2-x1,y2-y1);
+  const length=Math.hypot(x2-x1, y2-y1);
   const angle=Math.atan2(y2-y1,x2-x1)*(180/Math.PI);
 
   line.style.width=length+"px";
@@ -375,7 +370,7 @@ function drawWinningLine(combo,color){
   line.style.top=y1+"px";
   line.style.transform=`rotate(${angle}deg)`;
   line.style.background=color;
-  line.style.boxShadow=`0 0 15px ${color},0 0 30px ${color}`;
+  line.style.boxShadow=`0 0 15px ${color}, 0 0 30px ${color}`;
 
   boardElement.appendChild(line);
   winningLine=line;
@@ -413,17 +408,19 @@ function getRandomMove(){
 }
 
 function getSmartMove(){
+  // Try to win
   for(let combo of winningCombinations){
     const vals=combo.map(i=>board[i]);
-    if(vals.filter(v=>v===aiPlayer).length===2 && vals.includes("")){
+    if(vals.filter(v => v === aiPlayer).length===2 && vals.includes("")){
       return combo[vals.indexOf("")];
     }
   }
 
-  const opponent=aiPlayer==="X"?"O":"X";
+  // Block player
+  const opponent = aiPlayer==="X"?"O":"X";
   for(let combo of winningCombinations){
     const vals=combo.map(i=>board[i]);
-    if(vals.filter(v=>v===opponent).length===2 && vals.includes("")){
+    if(vals.filter(v => v === opponent).length===2 && vals.includes("")){
       return combo[vals.indexOf("")];
     }
   }
