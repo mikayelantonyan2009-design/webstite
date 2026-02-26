@@ -183,6 +183,20 @@ display:none;
 gap:20px;
 }
 
+#airHockey{
+margin-top:30px;
+background:#0b1d35;
+border-radius:20px;
+box-shadow:
+0 0 25px #87CEEB,
+0 0 60px #87CEEB inset;
+}
+
+/* Goal glow */
+.goalGlow{
+box-shadow:0 0 20px red,0 0 40px red;
+}
+
 </style>
 </head>
 
@@ -196,7 +210,7 @@ gap:20px;
 <!-- GAME SELECT -->
 <div class="game-selection" id="gameSelection">
 <button class="game-btn blue-glow" onclick="openTicTacToe()">Tic Tac Toe</button>
-<button class="game-btn red-glow">Air Hockey</button>
+<button class="game-btn red-glow" onclick="openAirHockey()">Air Hockey</button>
 </div>
 
 <!-- MODE -->
@@ -225,7 +239,8 @@ gap:20px;
 </div>
 
 <div class="board" id="board"></div>
-
+<canvas id="airHockey" width="900" height="500" style="display:none;"></canvas>
+  
 <div id="status"></div>
 
 <div class="controls" id="controls">
@@ -542,6 +557,175 @@ return combo[vals.indexOf("")]
 }
 
 return null
+
+}
+
+/* ================= AIR HOCKEY ================= */
+
+const canvas = document.getElementById("airHockey");
+const ctx = canvas.getContext("2d");
+
+let puck = {
+x:450,
+y:250,
+vx:4,
+vy:3,
+r:10
+};
+
+let player = {
+x:200,
+y:250,
+r:22
+};
+
+let ai = {
+x:700,
+y:250,
+r:22
+};
+
+function openAirHockey(){
+
+gameSelection.style.display="none"
+boardElement.style.display="none"
+scoreboard.style.display="none"
+controls.style.display="none"
+modeSelection.style.display="none"
+xoSelection.style.display="none"
+difficultySelection.style.display="none"
+
+canvas.style.display="block"
+backBtn.style.display="block"
+
+requestAnimationFrame(gameLoop)
+
+}
+
+/* attach to button */
+document.querySelectorAll(".game-btn")[1].onclick=openAirHockey;
+
+/* mouse control */
+
+canvas.addEventListener("mousemove",e=>{
+const rect=canvas.getBoundingClientRect()
+
+player.x=e.clientX-rect.left
+player.y=e.clientY-rect.top
+
+/* keep player on left side */
+
+if(player.x>canvas.width/2-20) player.x=canvas.width/2-20
+})
+
+function drawTable(){
+
+/* outer rim */
+
+ctx.lineWidth=12
+ctx.strokeStyle="#87CEEB"
+ctx.shadowColor="#87CEEB"
+ctx.shadowBlur=20
+ctx.strokeRect(10,10,canvas.width-20,canvas.height-20)
+
+/* goals */
+
+ctx.shadowColor="red"
+ctx.shadowBlur=25
+ctx.fillStyle="red"
+
+ctx.fillRect(0,200,20,100)
+ctx.fillRect(canvas.width-20,200,20,100)
+
+}
+
+function drawCircle(x,y,r,color,glow){
+
+ctx.beginPath()
+ctx.arc(x,y,r,0,Math.PI*2)
+
+ctx.fillStyle=color
+
+ctx.shadowColor=glow
+ctx.shadowBlur=20
+
+ctx.fill()
+ctx.closePath()
+
+}
+
+function update(){
+
+puck.x+=puck.vx
+puck.y+=puck.vy
+
+/* wall bounce */
+
+if(puck.y<20 || puck.y>canvas.height-20){
+puck.vy*=-1
+}
+
+/* goals reset */
+
+if(puck.x<0 || puck.x>canvas.width){
+resetPuck()
+}
+
+/* paddle collision */
+
+checkCollision(player)
+checkCollision(ai)
+
+/* simple AI */
+
+ai.y += (puck.y-ai.y)*0.05
+
+}
+
+function checkCollision(p){
+
+const dx=puck.x-p.x
+const dy=puck.y-p.y
+const dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<p.r+puck.r){
+
+const angle=Math.atan2(dy,dx)
+
+puck.vx=Math.cos(angle)*6
+puck.vy=Math.sin(angle)*6
+
+}
+
+}
+
+function resetPuck(){
+
+puck.x=canvas.width/2
+puck.y=canvas.height/2
+puck.vx=(Math.random()>0.5?1:-1)*4
+puck.vy=(Math.random()*4)-2
+
+}
+
+function gameLoop(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+drawTable()
+
+update()
+
+/* puck */
+
+drawCircle(puck.x,puck.y,puck.r,"black","black")
+
+/* paddles */
+
+drawCircle(player.x,player.y,player.r,"#87CEEB","#87CEEB")
+drawCircle(ai.x,ai.y,ai.r,"#87CEEB","#87CEEB")
+
+requestAnimationFrame(gameLoop)
 
 }
 
