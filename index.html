@@ -4,526 +4,547 @@
 <meta charset="UTF-8">
 <title>Open Games</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+
 <style>
-.game-selection {
-  display: flex;
-  gap: 60px;
-  margin-top: 40px;
-}
 
-.game-btn {
-  width: 260px;
-  height: 120px;
-  font-size: 32px;
-  border-radius: 20px;
-  background: white;
-  border: none;
-  cursor: pointer;
-  font-family: 'Orbitron', sans-serif;
-  transition: 0.2s;
-}
-
-.game-btn:hover {
-  transform: scale(1.08);
-}
-body {
-  margin: 0;
-  font-family: 'Orbitron', sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: linear-gradient(135deg, #87CEEB, #ff4d4d);
-  min-height: 100vh;
-  position: relative;
+body{
+margin:0;
+font-family:'Orbitron',sans-serif;
+display:flex;
+flex-direction:column;
+align-items:center;
+background:linear-gradient(135deg,#87CEEB,#ff4d4d);
+min-height:100vh;
 }
 
 /* HEADER */
-header {
-  width: 100%;
-  background: white;
-  text-align: center;
-  padding: 15px 0;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  position: relative;
+
+header{
+width:100%;
+background:white;
+text-align:center;
+padding:15px 0;
+box-shadow:0 2px 6px rgba(0,0,0,.2);
+position:relative;
 }
-header h1 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 48px;
-  margin: 0;
+
+header h1{
+margin:0;
+font-size:48px;
 }
-header .open { color: #ff2e2e; text-shadow: 0 0 20px #ff2e2e, 0 0 40px #ff2e2e; }
-header .games { color: #87CEEB; text-shadow: 0 0 20px #87CEEB, 0 0 40px #87CEEB; }
+
+.open{
+color:#ff2e2e;
+text-shadow:0 0 20px #ff2e2e,0 0 40px #ff2e2e;
+}
+
+.games{
+color:#87CEEB;
+text-shadow:0 0 20px #87CEEB,0 0 40px #87CEEB;
+}
 
 /* BACK BUTTON */
-#backBtn {
-  position: absolute;
-  left: 15px;
-  top: 15px;
-  padding: 12px 25px;
-  font-size: 18px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-family: 'Orbitron', sans-serif;
-  background-color: white;
-  color: #ff2e2e;
-  text-shadow: 0 0 15px #ff2e2e, 0 0 30px #ff2e2e;
-  transition: 0.2s;
-  display: none;
-}
-#backBtn:hover { transform: scale(1.05); }
 
-/* PAGE TITLE */
-h2.page-title {
-  font-family: 'Orbitron', sans-serif;
-  color: white;
-  font-size: 48px;
-  margin-bottom: 20px;
+#backBtn{
+position:absolute;
+left:15px;
+top:15px;
+padding:10px 22px;
+font-size:18px;
+border:none;
+border-radius:10px;
+background:white;
+cursor:pointer;
+display:none;
+font-family:'Orbitron',sans-serif;
 }
 
-/* BUTTONS */
-.mode-selection, .xo-selection, .difficulty-selection {
-  display: flex;
-  gap: 40px;
-  margin-bottom: 20px;
+.red-glow{
+color:#ff2e2e;
+text-shadow:0 0 15px #ff2e2e,0 0 30px #ff2e2e;
 }
-button {
-  padding: 15px 30px;
-  font-size: 20px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-family: 'Orbitron', sans-serif;
-  background-color: white;
-  transition: 0.2s;
+
+.blue-glow{
+color:#87CEEB;
+text-shadow:0 0 15px #87CEEB,0 0 30px #87CEEB;
 }
-button.red-glow { color: #ff2e2e; text-shadow: 0 0 15px #ff2e2e, 0 0 30px #ff2e2e; }
-button.blue-glow { color: #87CEEB; text-shadow: 0 0 15px #87CEEB, 0 0 30px #87CEEB; }
-button:hover { transform: scale(1.05); }
+
+/* GAME SELECT */
+
+.game-selection{
+display:flex;
+gap:60px;
+margin-top:120px;
+}
+
+.game-btn{
+font-size:36px;
+padding:40px 70px;
+background:white;
+border:none;
+border-radius:14px;
+cursor:pointer;
+}
+
+/* MENUS */
+
+.mode-selection,
+.xo-selection,
+.difficulty-selection{
+display:none;
+gap:40px;
+margin-top:40px;
+}
+
+button{
+font-family:'Orbitron',sans-serif;
+padding:15px 30px;
+font-size:20px;
+border:none;
+border-radius:10px;
+background:white;
+cursor:pointer;
+}
 
 /* SCOREBOARD */
-.scoreboard-box {
-  display: flex;
-  gap: 50px;
-  margin-bottom: 15px;
-  font-size: 28px;
-  background-color: white;
-  padding: 10px 30px;
-  border-radius: 12px;
-  justify-content: center;
+
+.scoreboard-box{
+display:none;
+gap:50px;
+margin:20px;
+background:white;
+padding:10px 30px;
+border-radius:12px;
+font-size:28px;
 }
-.scoreboard-box div { text-shadow: 0 0 15px; }
-.score-x { color: #ff2e2e; text-shadow: 0 0 20px #ff2e2e, 0 0 40px #ff2e2e; }
-.score-o { color: #87CEEB; text-shadow: 0 0 20px #87CEEB, 0 0 40px #87CEEB; }
+
+.score-x{
+color:#ff2e2e;
+text-shadow:0 0 20px #ff2e2e,0 0 40px #ff2e2e;
+}
+
+.score-o{
+color:#87CEEB;
+text-shadow:0 0 20px #87CEEB,0 0 40px #87CEEB;
+}
 
 /* BOARD */
-.board {
-  display: grid;
-  grid-template-columns: repeat(3, 100px);
-  grid-template-rows: repeat(3, 100px);
-  gap: 8px;
-  margin-bottom: 20px;
-  position: relative;
-}
-.cell {
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 48px;
-  cursor: pointer;
-  border-radius: 12px;
-  transition: transform 0.1s ease, background 0.2s;
-  position: relative;
-  z-index: 1;
-}
-.cell:hover { background-color: #f0f0f0; transform: scale(1.05); }
-.x { color: #ff2e2e; text-shadow: 0 0 15px #ff2e2e; }
-.o { color: #87CEEB; text-shadow: 0 0 15px #87CEEB; }
 
-#status {
-  font-size: 28px;
-  color: white;
-  margin-bottom: 15px;
-  min-height: 40px;
-  text-align: center;
-  font-family: 'Orbitron', sans-serif;
-}
-.status-x {
-  color: #ff2e2e;
-  text-shadow: 0 0 20px #ff2e2e, 0 0 40px #ff2e2e;
-}
-.status-o {
-  color: #87CEEB;
-  text-shadow: 0 0 20px #87CEEB, 0 0 40px #87CEEB;
-}
-.status-draw {
-  color: white;
-  text-shadow: 0 0 20px white, 0 0 40px white;
+.board{
+display:none;
+grid-template-columns:repeat(3,100px);
+grid-template-rows:repeat(3,100px);
+gap:8px;
+position:relative;
 }
 
-/* RESTART / NEXT BUTTONS */
-button.restart-btn, button.next-btn {
-  padding: 10px 20px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: 'Orbitron', sans-serif;
-  background-color: white;
-  transition: 0.2s;
-}
-button.restart-btn.red-glow, button.next-btn.red-glow { color:#ff2e2e; text-shadow:0 0 15px #ff2e2e, 0 0 30px #ff2e2e; }
-button.restart-btn.blue-glow, button.next-btn.blue-glow { color:#87CEEB; text-shadow:0 0 15px #87CEEB, 0 0 30px #87CEEB; }
-
-/* WINNING LINE */
-.line {
-  position: absolute;
-  height: 6px;
-  border-radius: 4px;
-  transform-origin: left center;
-  pointer-events: none;
-  z-index: 20;
+.cell{
+background:white;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:48px;
+cursor:pointer;
 }
 
-.pulse { animation: pulse 0.5s ease-in-out; }
+.x{
+color:#ff2e2e;
+text-shadow:0 0 15px #ff2e2e;
+}
+
+.o{
+color:#87CEEB;
+text-shadow:0 0 15px #87CEEB;
+}
+
+/* WIN LINE */
+
+.line{
+position:absolute;
+height:6px;
+border-radius:4px;
+transform-origin:left center;
+}
+
+/* STATUS */
+
+#status{
+color:white;
+font-size:24px;
+margin:15px;
+}
+
+/* CONTROL BUTTONS */
+
+.controls{
+margin-top:10px;
+display:none;
+gap:20px;
+}
+
 </style>
 </head>
+
 <body>
 
 <header>
-  <button id="backBtn" onclick="goBack()">← Back</button>
-  <h1><span class="open">Open</span> <span class="games">Games</span></h1>
+<button id="backBtn" onclick="goBack()" class="red-glow">← Back</button>
+<h1><span class="open">Open</span> <span class="games">Games</span></h1>
 </header>
 
-<h2 class="page-title" id="page-title">Open Games</h2>
-
- <!-- MAIN GAME SELECTION -->
-<div class="mode-selection" id="mode-selection" style="display:none;">
-  <button class="game-btn blue-glow" onclick="openTicTacToe()">Tic Tac Toe</button>
-  <button class="game-btn red-glow">Air Hockey</button>
-</div>
-  
-<!-- TIC TAC TOE MENU -->
-<div class="mode-selection" id="mode-selection">
-  <button class="red-glow" onclick="chooseMode('player')">Vs Player</button>
-  <button class="blue-glow" onclick="chooseMode('computer')">Vs Computer</button>
+<!-- GAME SELECT -->
+<div class="game-selection" id="gameSelection">
+<button class="game-btn blue-glow" onclick="openTicTacToe()">Tic Tac Toe</button>
+<button class="game-btn red-glow">Air Hockey</button>
 </div>
 
-<!-- XO SELECTION -->
-<div class="xo-selection" id="xo-selection" style="display:none;">
-  <button class="red-glow" onclick="chooseXO('X')">Play as X</button>
-  <button class="blue-glow" onclick="chooseXO('O')">Play as O</button>
+<!-- MODE -->
+<div class="mode-selection" id="modeSelection">
+<button class="red-glow" onclick="chooseMode('player')">Vs Player</button>
+<button class="blue-glow" onclick="chooseMode('computer')">Vs Computer</button>
 </div>
 
-<!-- AI DIFFICULTY SELECTION -->
-<div class="difficulty-selection" id="difficulty-selection" style="display:none;">
-  <button class="red-glow" onclick="chooseDifficulty('easy')">Easy</button>
-  <button class="blue-glow" onclick="chooseDifficulty('medium')">Medium</button>
-  <button class="red-glow" onclick="chooseDifficulty('hard')">Hard</button>
+<!-- XO -->
+<div class="xo-selection" id="xoSelection">
+<button class="red-glow" onclick="chooseXO('X')">Play as X</button>
+<button class="blue-glow" onclick="chooseXO('O')">Play as O</button>
+</div>
+
+<!-- DIFFICULTY -->
+<div class="difficulty-selection" id="difficultySelection">
+<button class="red-glow" onclick="chooseDifficulty('easy')">Easy</button>
+<button class="blue-glow" onclick="chooseDifficulty('medium')">Medium</button>
+<button class="red-glow" onclick="chooseDifficulty('hard')">Hard</button>
 </div>
 
 <!-- SCOREBOARD -->
-<div class="scoreboard-box" id="scoreboard" style="display:none;">
-  <div class="score-x" id="scoreX">0</div>
-  <div class="score-o" id="scoreO">0</div>
+<div class="scoreboard-box" id="scoreboard">
+<div class="score-x" id="scoreX">0</div>
+<div class="score-o" id="scoreO">0</div>
 </div>
 
-<div class="board" id="board" style="display:none;"></div>
+<div class="board" id="board"></div>
+
 <div id="status"></div>
-<div>
-  <button class="restart-btn red-glow" onclick="restartGame()" style="display:none;">Restart</button>
-  <button class="next-btn blue-glow" onclick="nextRound()" style="display:none;">Next Round</button>
+
+<div class="controls" id="controls">
+<button class="red-glow" onclick="restartGame()">Restart</button>
+<button class="blue-glow" onclick="nextRound()">Next Round</button>
 </div>
 
 <script>
-// ================= DOM =================
-const boardElement = document.getElementById("board");
-const scoreXDisplay = document.getElementById("scoreX");
-const scoreODisplay = document.getElementById("scoreO");
-const scoreboard = document.getElementById("scoreboard");
-const modeSelection = document.getElementById("mode-selection");
-const xoSelection = document.getElementById("xo-selection");
-const difficultySelection = document.getElementById("difficulty-selection");
-const backBtn = document.getElementById("backBtn");
-const restartBtn = document.querySelector(".restart-btn");
-const nextBtn = document.querySelector(".next-btn");
-const statusDisplay = document.getElementById("status");  
-const gameSelection = document.getElementById("game-selection");
-const pageTitle = document.getElementById("page-title");
-const statusText = document.getElementById("status");
-// ================= VARIABLES =================
-let cells = [];
-let board = ["","","","","","","","",""];
-let currentPlayer = "X"; // Always X starts
-let playerSymbol = "X";
-let aiPlayer = "O";
-let gameMode = null;
-let aiDifficulty = "medium";
-let gameOver = false;
-let scores = { X: 0, O: 0 };
-let winningLine = null;
 
-const winningCombinations = [
-  [0,1,2],[3,4,5],[6,7,8],
-  [0,3,6],[1,4,7],[2,5,8],
-  [0,4,8],[2,4,6]
-];
+/* DOM */
 
-const gameSelection = document.getElementById("game-selection");
-const pageTitle = document.getElementById("page-title");
+const gameSelection=document.getElementById("gameSelection")
+const modeSelection=document.getElementById("modeSelection")
+const xoSelection=document.getElementById("xoSelection")
+const difficultySelection=document.getElementById("difficultySelection")
+const boardElement=document.getElementById("board")
+const scoreboard=document.getElementById("scoreboard")
+const backBtn=document.getElementById("backBtn")
+const controls=document.getElementById("controls")
+const statusText=document.getElementById("status")
+
+const scoreX=document.getElementById("scoreX")
+const scoreO=document.getElementById("scoreO")
+
+/* VARIABLES */
+
+let cells=[]
+let board=["","","","","","","","",""]
+let currentPlayer="X"
+let playerSymbol="X"
+let aiPlayer="O"
+let gameMode=null
+let gameOver=false
+let aiDifficulty="medium"
+let scores={X:0,O:0}
+let winningLine=null
+
+const wins=[
+[0,1,2],[3,4,5],[6,7,8],
+[0,3,6],[1,4,7],[2,5,8],
+[0,4,8],[2,4,6]
+]
+
+/* OPEN GAME */
 
 function openTicTacToe(){
-  gameSelection.style.display = "none";
-  pageTitle.textContent = "Tic Tac Toe";
-  modeSelection.style.display = "flex";
+gameSelection.style.display="none"
+modeSelection.style.display="flex"
+backBtn.style.display="block"
 }
-// ================= CREATE BOARD =================
-function createBoard(){
-  boardElement.innerHTML = "";
-  cells = [];
 
-  for(let i=0;i<9;i++){
-    const cell = document.createElement("div");
-    cell.classList.add("cell");
-    cell.dataset.index = i;
+/* BACK */
 
-    cell.addEventListener("click", () => {
-      if(board[i]!="" || gameOver) return;
-      makeMove(i);
-    });
+function goBack(){
 
-    boardElement.appendChild(cell);
-    cells.push(cell);
-  }
+gameSelection.style.display="flex"
+modeSelection.style.display="none"
+xoSelection.style.display="none"
+difficultySelection.style.display="none"
+
+boardElement.style.display="none"
+scoreboard.style.display="none"
+controls.style.display="none"
+
+backBtn.style.display="none"
+
+statusText.textContent=""
+
+scores={X:0,O:0}
+updateScoreboard()
+
 }
-function goBack() {
-    // Hide game elements
-    boardElement.style.display = "none";
-    scoreboard.style.display = "none";
-    xoSelection.style.display = "none";
-    difficultySelection.style.display = "none";
-    restartBtn.style.display = "none";
-    nextBtn.style.display = "none";
-    backBtn.style.display = "none";
 
-    // Show main menu
-    modeSelection.style.display = "none";
-    gameSelection.style.display = "flex";
-    pageTitle.textContent = "Open Games";
+/* MODE */
 
-    // Reset scores
-    scores = { X: 0, O: 0 };
-    updateScoreboard();
-
-    // Clear board
-    board = ["","","","","","","","",""];
-    gameOver = false;
-
-    if (winningLine) {
-        winningLine.remove();
-        winningLine = null;
-    }
-}
-// ================= MENU FLOW =================
 function chooseMode(mode){
-  gameMode = mode === "computer" ? "ai" : "player";
-  modeSelection.style.display="none";
-  xoSelection.style.display="flex";
-  backBtn.style.display="block";
+gameMode=mode==="computer"?"ai":"player"
+modeSelection.style.display="none"
+xoSelection.style.display="flex"
 }
+
+/* SYMBOL */
 
 function chooseXO(symbol){
-  playerSymbol = symbol;
-  aiPlayer = symbol==="X"?"O":"X"; // AI is opposite
-  currentPlayer = "X"; // Always X starts
-  xoSelection.style.display="none";
 
-  if(gameMode==="ai"){
-    difficultySelection.style.display="flex";
-  } else {
-    startGame();
-  }
+playerSymbol=symbol
+aiPlayer=symbol==="X"?"O":"X"
+
+xoSelection.style.display="none"
+
+if(gameMode==="ai"){
+difficultySelection.style.display="flex"
+}else{
+startGame()
 }
+
+}
+
+/* DIFFICULTY */
 
 function chooseDifficulty(level){
-  aiDifficulty = level;
-  difficultySelection.style.display="none";
-  startGame();
+aiDifficulty=level
+difficultySelection.style.display="none"
+startGame()
 }
+
+/* START */
 
 function startGame(){
-  statusDisplay.textContent = "";
-  statusDisplay.className = "";
-  scoreboard.style.display="flex";
-  boardElement.style.display="grid";
-  restartBtn.style.display="inline-block";
-  nextBtn.style.display="inline-block";
 
-  createBoard();
-  gameOver=false;
-  board=["","","","","","","","",""];
-  currentPlayer="X"; // Always X starts
+board=["","","","","","","","",""]
+gameOver=false
+currentPlayer="X"
 
-  // If AI is X, let it start
-  if(gameMode==="ai" && currentPlayer===aiPlayer){
-    setTimeout(makeAIMove, 400);
-  }
+createBoard()
+
+boardElement.style.display="grid"
+scoreboard.style.display="flex"
+controls.style.display="flex"
+
+statusText.textContent=""
+
+if(gameMode==="ai" && aiPlayer==="X"){
+setTimeout(makeAIMove,400)
 }
 
-// ================= GAME LOGIC =================
-function makeMove(index){
-  board[index]=currentPlayer;
-  cells[index].textContent=currentPlayer;
-  cells[index].classList.add(currentPlayer==="X"?"x":"o");
-
-  if(checkWinner()) return;
-
-  if(board.every(c=>c!=="")){
-    gameOver=true;
-    return;
-  }
-
-  currentPlayer = currentPlayer==="X"?"O":"X";
-
-  if(gameMode==="ai" && currentPlayer===aiPlayer && !gameOver){
-    setTimeout(makeAIMove, 400);
-  }
 }
 
-// ================= CHECK WIN =================
-function checkWinner(){
-  for(let combo of winningCombinations){
-    const [a,b,c] = combo;
+/* BOARD */
 
-    if(board[a] && board[a] === board[b] && board[a] === board[c]){
-      gameOver = true;
-      scores[currentPlayer]++;
-      updateScoreboard(currentPlayer);
+function createBoard(){
 
-      drawWinningLine(combo, currentPlayer==="X"?"red":"skyblue");
+boardElement.innerHTML=""
+cells=[]
 
-      // Show winner message
-      statusDisplay.textContent = currentPlayer + " Wins!";
-      statusDisplay.className = currentPlayer==="X" ? "status-x" : "status-o";
+for(let i=0;i<9;i++){
 
-      return true;
-    }
-  }
+const cell=document.createElement("div")
+cell.className="cell"
+cell.dataset.index=i
 
-  // Check draw
-  if(board.every(cell => cell !== "")){
-    gameOver = true;
-    statusDisplay.textContent = "It's a Draw!";
-    statusDisplay.className = "status-draw";
-    return true;
-  }
+cell.onclick=()=>{
 
-  return false;
+if(board[i]!==""||gameOver) return
+makeMove(i)
+
 }
 
-// ================= SCOREBOARD =================
-function updateScoreboard(player){
-  scoreXDisplay.textContent = scores.X;
-  scoreODisplay.textContent = scores.O;
+boardElement.appendChild(cell)
+cells.push(cell)
 
-  scoreXDisplay.classList.remove("pulse");
-  scoreODisplay.classList.remove("pulse");
-
-  if(player==="X") scoreXDisplay.classList.add("pulse");
-  if(player==="O") scoreODisplay.classList.add("pulse");
 }
 
-function resetScores(){
-  scores={X:0,O:0};
-  updateScoreboard();
 }
 
-// ================= WIN LINE =================
-function drawWinningLine(combo, color) {
-  if (winningLine) winningLine.remove();
+/* MOVE */
 
-  const cellSize = 100;
-  const gap = 8;
+function makeMove(i){
 
-  const startRow = Math.floor(combo[0] / 3);
-  const startCol = combo[0] % 3;
-  const endRow = Math.floor(combo[2] / 3);
-  const endCol = combo[2] % 3;
+board[i]=currentPlayer
+cells[i].textContent=currentPlayer
+cells[i].classList.add(currentPlayer==="X"?"x":"o")
 
-  const x1 = startCol * (cellSize + gap) + cellSize / 2;
-  const y1 = startRow * (cellSize + gap) + cellSize / 2;
-  const x2 = endCol * (cellSize + gap) + cellSize / 2;
-  const y2 = endRow * (cellSize + gap) + cellSize / 2;
+if(checkWin()) return
 
-  const length = Math.hypot(x2 - x1, y2 - y1);
-  const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
-
-  const line = document.createElement("div");
-  line.className = "line";
-  line.style.width = length + "px";
-  line.style.left = x1 + "px";
-  line.style.top = y1 + "px";
-  line.style.transform = `rotate(${angle}deg)`;
-  line.style.background = color;
-  line.style.boxShadow = `0 0 15px ${color}, 0 0 30px ${color}`;
-
-  boardElement.appendChild(line);
-  winningLine = line;
+if(board.every(c=>c!=="")){
+statusText.textContent="Draw"
+gameOver=true
+return
 }
 
-// ================= RESTART & NEXT =================
+currentPlayer=currentPlayer==="X"?"O":"X"
+
+if(gameMode==="ai" && currentPlayer===aiPlayer && !gameOver){
+setTimeout(makeAIMove,400)
+}
+
+}
+
+/* CHECK WIN */
+
+function checkWin(){
+
+for(let combo of wins){
+
+const[a,b,c]=combo
+
+if(board[a]&&board[a]===board[b]&&board[a]===board[c]){
+
+gameOver=true
+
+scores[currentPlayer]++
+updateScoreboard()
+
+drawLine(combo,currentPlayer==="X"?"red":"skyblue")
+
+statusText.textContent=currentPlayer+" Wins"
+
+return true
+}
+
+}
+
+return false
+
+}
+
+/* LINE */
+
+function drawLine(combo,color){
+
+if(winningLine) winningLine.remove()
+
+const size=100
+const gap=8
+
+const r1=Math.floor(combo[0]/3)
+const c1=combo[0]%3
+
+const r2=Math.floor(combo[2]/3)
+const c2=combo[2]%3
+
+const x1=c1*(size+gap)+size/2
+const y1=r1*(size+gap)+size/2
+
+const x2=c2*(size+gap)+size/2
+const y2=r2*(size+gap)+size/2
+
+const length=Math.hypot(x2-x1,y2-y1)
+const angle=Math.atan2(y2-y1,x2-x1)*180/Math.PI
+
+const line=document.createElement("div")
+line.className="line"
+
+line.style.width=length+"px"
+line.style.left=x1+"px"
+line.style.top=y1+"px"
+line.style.transform=`rotate(${angle}deg)`
+line.style.background=color
+line.style.boxShadow=`0 0 15px ${color},0 0 30px ${color}`
+
+boardElement.appendChild(line)
+winningLine=line
+
+}
+
+/* SCORE */
+
+function updateScoreboard(){
+scoreX.textContent=scores.X
+scoreO.textContent=scores.O
+}
+
+/* RESTART */
+
 function restartGame(){
-  resetScores();
-  startGame();
+scores={X:0,O:0}
+updateScoreboard()
+startGame()
 }
+
+/* NEXT */
 
 function nextRound(){
-  startGame();
+startGame()
 }
 
-// ================= AI =================
+/* AI */
+
 function makeAIMove(){
-  if(gameOver) return;
 
-  let move;
+let move
 
-  if(aiDifficulty==="easy"){
-    move=getRandomMove();
-  } else {
-    move=getSmartMove() ?? getRandomMove();
-  }
-
-  if(move!==undefined) makeMove(move);
+if(aiDifficulty==="easy"){
+move=randomMove()
+}else{
+move=smartMove()??randomMove()
 }
 
-function getRandomMove(){
-  const empty=board.map((v,i)=>v===""?i:null).filter(v=>v!==null);
-  if(empty.length===0) return;
-  return empty[Math.floor(Math.random()*empty.length)];
+makeMove(move)
+
 }
 
-function getSmartMove(){
-  // Try to win
-  for(let combo of winningCombinations){
-    const vals=combo.map(i=>board[i]);
-    if(vals.filter(v => v === aiPlayer).length===2 && vals.includes("")){
-      return combo[vals.indexOf("")];
-    }
-  }
+function randomMove(){
 
-  // Block player
-  const opponent = aiPlayer==="X"?"O":"X";
-  for(let combo of winningCombinations){
-    const vals=combo.map(i=>board[i]);
-    if(vals.filter(v => v === opponent).length===2 && vals.includes("")){
-      return combo[vals.indexOf("")];
-    }
-  }
+const empty=board.map((v,i)=>v===""?i:null).filter(v=>v!==null)
 
-  return null;
+return empty[Math.floor(Math.random()*empty.length)]
+
 }
+
+function smartMove(){
+
+for(let combo of wins){
+
+const vals=combo.map(i=>board[i])
+
+if(vals.filter(v=>v===aiPlayer).length===2 && vals.includes("")){
+return combo[vals.indexOf("")]
+}
+
+}
+
+const opponent=aiPlayer==="X"?"O":"X"
+
+for(let combo of wins){
+
+const vals=combo.map(i=>board[i])
+
+if(vals.filter(v=>v===opponent).length===2 && vals.includes("")){
+return combo[vals.indexOf("")]
+}
+
+}
+
+return null
+
+}
+
 </script>
 </body>
 </html>
