@@ -296,6 +296,7 @@ backBtn.style.display="block"
 
 function goBack(){
 
+hockeyRunning = false
 canvas.style.display = "none";
 gameSelection.style.display="flex"
 modeSelection.style.display="none"
@@ -566,6 +567,8 @@ return null
 const canvas = document.getElementById("airHockey");
 const ctx = canvas.getContext("2d");
 
+let hockeyRunning = false
+
 let puck = {
 x:450,
 y:250,
@@ -589,17 +592,12 @@ r:22
 function openAirHockey(){
 
 gameSelection.style.display="none"
-boardElement.style.display="none"
-scoreboard.style.display="none"
-controls.style.display="none"
-modeSelection.style.display="none"
-xoSelection.style.display="none"
-difficultySelection.style.display="none"
 
 canvas.style.display="block"
 backBtn.style.display="block"
 
-requestAnimationFrame(gameLoop)
+hockeyRunning = true
+gameLoop()
 
 }
 
@@ -609,19 +607,25 @@ document.querySelectorAll(".game-btn")[1].onclick=openAirHockey;
 /* mouse control */
 
 canvas.addEventListener("mousemove",e=>{
-const rect=canvas.getBoundingClientRect()
 
-player.x = Math.max(player.r + 10, Math.min(canvas.width/2 - player.r, player.x));
-player.y = Math.max(player.r + 10, Math.min(canvas.height - player.r - 10, player.y));
-player.x=e.clientX-rect.left
-player.y=e.clientY-rect.top
+const rect = canvas.getBoundingClientRect()
+
+player.x = e.clientX - rect.left
+player.y = e.clientY - rect.top
+
+// keep player on left half
+if(player.x > canvas.width/2 - 30) player.x = canvas.width/2 - 30
+
+// keep inside rink
+player.x = Math.max(player.r + 10, player.x)
+player.y = Math.max(player.r + 10, Math.min(canvas.height - player.r - 10, player.y))
+
+})
 
 /* keep player on left side */
 
 if(player.x>canvas.width/2-20) player.x=canvas.width/2-20
 })
-
-function drawTable(){
 
 function drawTable(){
 
@@ -747,18 +751,14 @@ puck.vy=(Math.random()*4)-2
 
 function gameLoop(){
 
+if(!hockeyRunning) return
+
 ctx.clearRect(0,0,canvas.width,canvas.height)
 
 drawTable()
-
 update()
 
-/* puck */
-
 drawCircle(puck.x,puck.y,puck.r,"black","black")
-
-/* paddles */
-
 drawCircle(player.x,player.y,player.r,"#87CEEB","#87CEEB")
 drawCircle(ai.x,ai.y,ai.r,"#87CEEB","#87CEEB")
 
