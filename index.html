@@ -605,7 +605,7 @@ gameLoop()
 
 /* mouse control */
 
-canvas.addEventListener("mousemove",e=>{
+canvas.addEventListener("mousemove", e => {
 
 const rect = canvas.getBoundingClientRect()
 
@@ -620,7 +620,6 @@ player.x = Math.max(player.r + 10, player.x)
 player.y = Math.max(player.r + 10, Math.min(canvas.height - player.r - 10, player.y))
 
 })
-
 /* keep player on left side */
 
 if(player.x>canvas.width/2-20) player.x=canvas.width/2-20
