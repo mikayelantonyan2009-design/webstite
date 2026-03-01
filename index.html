@@ -592,6 +592,13 @@ r:22
 function openAirHockey(){
 
 gameSelection.style.display="none"
+modeSelection.style.display="none"
+xoSelection.style.display="none"
+difficultySelection.style.display="none"
+
+boardElement.style.display="none"
+scoreboard.style.display="none"
+controls.style.display="none"
 
 canvas.style.display="block"
 backBtn.style.display="block"
@@ -601,10 +608,6 @@ gameLoop()
 
 }
 
-
-
-/* mouse control */
-
 canvas.addEventListener("mousemove", e => {
 
 const rect = canvas.getBoundingClientRect()
@@ -612,34 +615,25 @@ const rect = canvas.getBoundingClientRect()
 player.x = e.clientX - rect.left
 player.y = e.clientY - rect.top
 
-// keep player on left half
 if(player.x > canvas.width/2 - 30) player.x = canvas.width/2 - 30
 
-// keep inside rink
 player.x = Math.max(player.r + 10, player.x)
 player.y = Math.max(player.r + 10, Math.min(canvas.height - player.r - 10, player.y))
 
 })
-/* keep player on left side */
-
-if(player.x>canvas.width/2-20) player.x=canvas.width/2-20
-})
 
 function drawTable(){
 
-// white ice
 ctx.shadowBlur = 0
 ctx.fillStyle = "white"
 ctx.fillRect(0,0,canvas.width,canvas.height)
 
-// blue glowing outer rink
 ctx.lineWidth = 12
 ctx.strokeStyle = "#87CEEB"
 ctx.shadowColor = "#87CEEB"
 ctx.shadowBlur = 20
 ctx.strokeRect(10,10,canvas.width-20,canvas.height-20)
 
-// center red line
 ctx.shadowBlur = 0
 ctx.strokeStyle = "red"
 ctx.lineWidth = 4
@@ -648,12 +642,10 @@ ctx.moveTo(canvas.width/2,0)
 ctx.lineTo(canvas.width/2,canvas.height)
 ctx.stroke()
 
-// center circle
 ctx.beginPath()
 ctx.arc(canvas.width/2,canvas.height/2,60,0,Math.PI*2)
 ctx.stroke()
 
-// goals
 ctx.shadowColor = "red"
 ctx.shadowBlur = 25
 ctx.fillStyle = "red"
@@ -669,7 +661,6 @@ ctx.beginPath()
 ctx.arc(x,y,r,0,Math.PI*2)
 
 ctx.fillStyle=color
-
 ctx.shadowColor=glow
 ctx.shadowBlur=20
 
@@ -683,18 +674,13 @@ function update(){
 puck.x+=puck.vx
 puck.y+=puck.vy
 
-/* wall bounce */
-
 if(puck.y<20 || puck.y>canvas.height-20){
 puck.vy*=-1
 }
 
-/* goals reset */
-
-// goal detection
 if(puck.x < 20){
     if(puck.y > 200 && puck.y < 300){
-        resetPuck() // left goal
+        resetPuck()
     }else{
         puck.vx *= -1
         puck.x = 20
@@ -703,19 +689,15 @@ if(puck.x < 20){
 
 if(puck.x > canvas.width - 20){
     if(puck.y > 200 && puck.y < 300){
-        resetPuck() // right goal
+        resetPuck()
     }else{
         puck.vx *= -1
         puck.x = canvas.width - 20
     }
 }
 
-/* paddle collision */
-
 checkCollision(player)
 checkCollision(ai)
-
-/* simple AI */
 
 ai.y += (puck.y-ai.y)*0.05
 
