@@ -210,9 +210,14 @@ box-shadow:0 0 20px red,0 0 40px red;
 <!-- GAME SELECT -->
 <div class="game-selection" id="gameSelection">
 <button class="game-btn blue-glow" onclick="openTicTacToe()">Tic Tac Toe</button>
-<button class="game-btn red-glow" onclick="openAirHockey()">Air Hockey</button>
+<button class="game-btn red-glow" onclick="openHockeyMenu()">Air Hockey</button>
 </div>
-
+<div class="difficulty-selection" id="hockeyDifficulty">
+<button class="blue-glow" onclick="startHockey('easy')">Easy</button>
+<button class="red-glow" onclick="startHockey('medium')">Medium</button>
+<button class="blue-glow" onclick="startHockey('hard')">Hard</button>
+</div>
+  
 <!-- MODE -->
 <div class="mode-selection" id="modeSelection">
 <button class="red-glow" onclick="chooseMode('player')">Vs Player</button>
@@ -292,10 +297,19 @@ modeSelection.style.display="flex"
 backBtn.style.display="block"
 }
 
+function openHockeyMenu(){
+
+gameSelection.style.display="none"
+document.getElementById("hockeyDifficulty").style.display="flex"
+backBtn.style.display="block"
+
+}
+
 /* BACK */
 
 function goBack(){
 
+document.getElementById("hockeyDifficulty").style.display="none"
 hockeyRunning = false
 canvas.style.display = "none";
 gameSelection.style.display="flex"
@@ -399,6 +413,23 @@ cells.push(cell)
 }
 
 /* MOVE */
+
+function startHockey(level){
+
+hockeyDifficulty = level
+
+if(level==="easy") aiSpeed = 0.03
+if(level==="medium") aiSpeed = 0.06
+if(level==="hard") aiSpeed = 0.12
+
+document.getElementById("hockeyDifficulty").style.display="none"
+
+canvas.style.display="block"
+
+hockeyRunning = true
+gameLoop()
+
+}
 
 function makeMove(i){
 
@@ -583,6 +614,9 @@ y:250,
 r:22
 };
 
+let hockeyDifficulty = "medium"
+let aiSpeed = 0.05
+
 let ai = {
 x:700,
 y:250,
@@ -699,7 +733,7 @@ if(puck.x > canvas.width - 20){
 checkCollision(player)
 checkCollision(ai)
 
-ai.y += (puck.y-ai.y)*0.05
+ai.y += (puck.y-ai.y)*aiSpeed
 
 }
 
