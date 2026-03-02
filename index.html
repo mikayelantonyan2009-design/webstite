@@ -415,6 +415,9 @@ cells.push(cell)
 
 /* MOVE */
 
+let hockeyDifficulty = "medium"
+let aiSpeed = 0.05
+
 function startHockey(level){
 
 hockeyDifficulty = level
@@ -434,7 +437,9 @@ scoreboard.style.display="none"
 controls.style.display="none"
 
 /* show rink */
+gameSelection.style.display="none"
 canvas.style.display="block"
+backBtn.style.display="block"
 backBtn.style.display="block"
 
 /* reset puck + paddles */
@@ -635,8 +640,6 @@ y:250,
 r:22
 };
 
-let hockeyDifficulty = "medium"
-let aiSpeed = 0.06
 
 let ai = {
 x:700,
