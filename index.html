@@ -743,38 +743,40 @@ ctx.closePath()
 
 function update(){
 
+// move puck
 puck.x += puck.vx
 puck.y += puck.vy
 
-// bounce top/bottom
-if(puck.y < 20 || puck.y > canvas.height - 20){
+// top / bottom bounce
+if(puck.y < puck.r + 10 || puck.y > canvas.height - puck.r - 10){
 puck.vy *= -1
 }
 
-// right wall / goal
-if(puck.x > canvas.width - 20){
+// left wall
+if(puck.x < puck.r + 10){
 if(puck.y > 200 && puck.y < 300){
 resetPuck()
 }else{
 puck.vx *= -1
-puck.x = canvas.width - 20
+puck.x = puck.r + 10
 }
 }
 
-// left wall / goal
-if(puck.x < 20){
+// right wall
+if(puck.x > canvas.width - puck.r - 10){
 if(puck.y > 200 && puck.y < 300){
 resetPuck()
 }else{
 puck.vx *= -1
-puck.x = 20
+puck.x = canvas.width - puck.r - 10
 }
 }
 
+// collisions
 checkCollision(player)
 checkCollision(ai)
 
-// AI movement
+// AI movement (free movement)
 ai.x += (puck.x - ai.x) * aiSpeed
 ai.y += (puck.y - ai.y) * aiSpeed
 
