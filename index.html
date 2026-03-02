@@ -682,16 +682,19 @@ player.y = Math.max(player.r + 10, Math.min(canvas.height - player.r - 10, playe
 
 function drawTable(){
 
+/* white ice */
 ctx.shadowBlur = 0
 ctx.fillStyle = "white"
 ctx.fillRect(0,0,canvas.width,canvas.height)
 
+/* blue glowing rink border */
 ctx.lineWidth = 12
 ctx.strokeStyle = "#87CEEB"
 ctx.shadowColor = "#87CEEB"
-ctx.shadowBlur = 20
+ctx.shadowBlur = 25
 ctx.strokeRect(10,10,canvas.width-20,canvas.height-20)
 
+/* center red line */
 ctx.shadowBlur = 0
 ctx.strokeStyle = "red"
 ctx.lineWidth = 4
@@ -700,16 +703,27 @@ ctx.moveTo(canvas.width/2,0)
 ctx.lineTo(canvas.width/2,canvas.height)
 ctx.stroke()
 
+ctx.strokeStyle = "rgba(255,0,0,0.4)"
+ctx.lineWidth = 2
 ctx.beginPath()
-ctx.arc(canvas.width/2,canvas.height/2,60,0,Math.PI*2)
+ctx.moveTo(canvas.width/4,0)
+ctx.lineTo(canvas.width/4,canvas.height)
+ctx.moveTo(canvas.width*0.75,0)
+ctx.lineTo(canvas.width*0.75,canvas.height)
 ctx.stroke()
 
+/* center circle */
+ctx.beginPath()
+ctx.arc(canvas.width/2,canvas.height/2,70,0,Math.PI*2)
+ctx.stroke()
+
+/* goal zones (red glowing bars on the rim) */
 ctx.shadowColor = "red"
-ctx.shadowBlur = 25
+ctx.shadowBlur = 35
 ctx.fillStyle = "red"
 
-ctx.fillRect(0,200,20,100)
-ctx.fillRect(canvas.width-20,200,20,100)
+ctx.fillRect(10,200,14,100)
+ctx.fillRect(canvas.width-24,200,14,100)
 
 }
 
