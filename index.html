@@ -726,54 +726,40 @@ ctx.closePath()
 
 function update(){
 
-if(puckActive){
 puck.x += puck.vx
 puck.y += puck.vy
-}
 
-// top/bottom bounce
-if(puck.y < 20){
-puck.y = 20
+// bounce top/bottom
+if(puck.y < 20 || puck.y > canvas.height - 20){
 puck.vy *= -1
 }
 
-if(puck.y > canvas.height - 20){
-puck.y = canvas.height - 20
-puck.vy *= -1
-}
-
-// right goal
+// right wall / goal
 if(puck.x > canvas.width - 20){
-    if(puck.y > 200 && puck.y < 300){
-        resetPuck()
-    }else{
-        puck.vx *= -1
-        puck.x = canvas.width - 20
-    }
+if(puck.y > 200 && puck.y < 300){
+resetPuck()
+}else{
+puck.vx *= -1
+puck.x = canvas.width - 20
+}
 }
 
-// left goal
+// left wall / goal
 if(puck.x < 20){
-    if(puck.y > 200 && puck.y < 300){
-        resetPuck()
-    }else{
-        puck.vx *= -1
-        puck.x = 20
-    }
+if(puck.y > 200 && puck.y < 300){
+resetPuck()
+}else{
+puck.vx *= -1
+puck.x = 20
+}
 }
 
 checkCollision(player)
 checkCollision(ai)
 
 // AI movement
-let dx = puck.x - ai.x
-let dy = puck.y - ai.y
-let dist = Math.sqrt(dx*dx + dy*dy)
-
-if(dist > 1){
-ai.x += dx * aiSpeed
-ai.y += dy * aiSpeed
-}
+ai.x += (puck.x - ai.x) * aiSpeed
+ai.y += (puck.y - ai.y) * aiSpeed
 
 }
 
