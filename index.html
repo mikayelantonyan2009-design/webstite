@@ -684,8 +684,14 @@ function drawTable(){
 
 /* white ice */
 ctx.shadowBlur = 0
-ctx.fillStyle = "white"
+
+// dark base
+ctx.fillStyle = "#0b1d35"
 ctx.fillRect(0,0,canvas.width,canvas.height)
+
+// inner white rink
+ctx.fillStyle = "#ffffff"
+ctx.fillRect(20,20,canvas.width-40,canvas.height-40)
 
 /* blue glowing rink border */
 ctx.lineWidth = 12
@@ -693,24 +699,25 @@ ctx.strokeStyle = "#87CEEB"
 ctx.shadowColor = "#87CEEB"
 ctx.shadowBlur = 25
 ctx.strokeRect(10,10,canvas.width-20,canvas.height-20)
+ctx.shadowBlur = 0
+ctx.shadowColor = "transparent"
 
 /* center red line */
-ctx.shadowBlur = 0
-ctx.strokeStyle = "red"
-ctx.lineWidth = 4
+ctx.shadowColor = "red"
+ctx.shadowBlur = 10
+ctx.strokeStyle = "#ff0000"
+ctx.lineWidth = 5
+
 ctx.beginPath()
 ctx.moveTo(canvas.width/2,0)
 ctx.lineTo(canvas.width/2,canvas.height)
 ctx.stroke()
 
-ctx.strokeStyle = "rgba(255,0,0,0.4)"
-ctx.lineWidth = 2
 ctx.beginPath()
-ctx.moveTo(canvas.width/4,0)
-ctx.lineTo(canvas.width/4,canvas.height)
-ctx.moveTo(canvas.width*0.75,0)
-ctx.lineTo(canvas.width*0.75,canvas.height)
+ctx.arc(canvas.width/2,canvas.height/2,70,0,Math.PI*2)
 ctx.stroke()
+
+ctx.shadowBlur = 0
 
 /* center circle */
 ctx.beginPath()
@@ -718,12 +725,15 @@ ctx.arc(canvas.width/2,canvas.height/2,70,0,Math.PI*2)
 ctx.stroke()
 
 /* goal zones (red glowing bars on the rim) */
-ctx.shadowColor = "red"
-ctx.shadowBlur = 35
-ctx.fillStyle = "red"
 
-ctx.fillRect(10,200,14,100)
-ctx.fillRect(canvas.width-24,200,14,100)
+ctx.shadowColor = "red"
+ctx.shadowBlur = 40
+ctx.fillStyle = "#ff0000"
+
+ctx.fillRect(6,180,20,140)
+ctx.fillRect(canvas.width-26,180,20,140)
+
+ctx.shadowBlur = 0
 
 }
 
@@ -732,11 +742,18 @@ function drawCircle(x,y,r,color,glow){
 ctx.beginPath()
 ctx.arc(x,y,r,0,Math.PI*2)
 
-ctx.fillStyle=color
-ctx.shadowColor=glow
-ctx.shadowBlur=20
+ctx.fillStyle = color
+
+ctx.shadowColor = glow
+ctx.shadowBlur = 25
 
 ctx.fill()
+
+ctx.lineWidth = 2
+ctx.strokeStyle = "black"
+ctx.stroke()
+
+ctx.shadowBlur = 0
 ctx.closePath()
 
 }
@@ -818,7 +835,7 @@ ctx.clearRect(0,0,canvas.width,canvas.height)
 drawTable()
 update()
 
-drawCircle(puck.x,puck.y,puck.r,"black","black")
+drawCircle(puck.x,puck.y,puck.r,"#111","#00ffff")
 drawCircle(player.x,player.y,player.r,"#87CEEB","#87CEEB")
 drawCircle(ai.x,ai.y,ai.r,"#87CEEB","#87CEEB")
 
